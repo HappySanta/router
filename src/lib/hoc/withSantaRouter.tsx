@@ -1,10 +1,15 @@
-import React, {useContext, useEffect, useState} from "react";
+import React, {useContext, useEffect, useState, ComponentType} from "react";
 import {Route} from "../entities/Route";
 import {State} from "../entities/State";
 import {RouterContext} from "../entities/RouterContext";
 
-export function withSantaRouter<T>(Component: T): T {
-    function withSantaRouter(props: {}) {
+export interface WithSantaRouterProps {
+    routeState: State,
+    route: Route,
+}
+
+export function withSantaRouter<T>(Component: ComponentType<T & WithSantaRouterProps>) {
+    function withSantaRouter(props: T) {
         const router = useContext(RouterContext);
         if (!router) throw new Error("Use withSantaRouter without context");
         const [route, setRoute] = useState<[Route, State]>([router.getCurrentRouteOrDef(), router.getCurrentStateOrDef()]);
@@ -20,5 +25,5 @@ export function withSantaRouter<T>(Component: T): T {
         // @ts-ignore
         return <Component routeState={route[1]} route={route[0]} {...props}/>;
     }
-    return withSantaRouter as unknown as T;
+    return withSantaRouter;
 }
