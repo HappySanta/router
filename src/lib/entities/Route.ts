@@ -137,8 +137,8 @@ export class Route {
 		return this.isModal() || this.isPopup()
 	}
 
-	getModalId(): string | number | null {
-		return this.params[MODAL_KEY] || null
+	getModalId():string|null {
+		return (this.params[MODAL_KEY]?.toString()) || null
 	}
 
 	setModalId(modalId: string): Route {

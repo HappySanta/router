@@ -2,17 +2,16 @@ import React, {useContext, useEffect, useState, ComponentType, useCallback, useR
 import {Route} from "../entities/Route";
 import {State} from "../entities/State";
 import {RouterContext} from "../entities/RouterContext";
+import {SantaRouterProps} from "./withSantaRouter";
 
-export interface WithThrottlingRouterProps {
-    routeState: State,
-    route: Route,
+export interface ThrottlingRouterProps extends SantaRouterProps {
     onTransitionEnd: () => void
 }
 
 // Магическое число милисекунд после которого можно обновлять VKUI и он не зависнет
 const UPDATE_INTERVAL:number = 650
 
-export function withThrottlingRouter<T>(Component: ComponentType<T>):ComponentType<WithThrottlingRouterProps & T> {
+export function withThrottlingRouter<T>(Component: ComponentType<ThrottlingRouterProps & T>):ComponentType<T> {
     function withThrottlingRouter(props: T) {
         const router = useContext(RouterContext);
         if (!router) throw new Error("Use withThrottlingRouter without context");

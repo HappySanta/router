@@ -3,12 +3,12 @@ import {Route} from "../entities/Route";
 import {State} from "../entities/State";
 import {RouterContext} from "../entities/RouterContext";
 
-export interface WithSantaRouterProps {
+export interface SantaRouterProps {
     routeState: State,
     route: Route,
 }
 
-export function withSantaRouter<T>(Component: ComponentType<T>):ComponentType<WithSantaRouterProps & T> {
+export function withSantaRouter<T>(Component: ComponentType<SantaRouterProps & T>):ComponentType<T> {
     function withSantaRouter(props: T) {
         const router = useContext(RouterContext);
         if (!router) throw new Error("Use withSantaRouter without context");
