@@ -60,12 +60,19 @@ export class Router extends EventEmitter<{
 			this.emit("enter", nextRoute, this.history.getCurrentRoute());
 			state.history = [nextRoute.getPanelId()]
 		}
-		this.history.init(nextRoute, state);
+		// при старте роутера у nextRoute не должен вызываться колбек onLeave
+		const currentRoute = nextRoute.clone()
+		currentRoute.structure.leaveCallback = null
+		this.history.init(currentRoute, state);
 		this.replace(state, nextRoute);
 		window.removeEventListener("popstate", this.onPopState);
 		window.addEventListener("popstate", this.onPopState);
-
 	}
+
+	stop() {
+		window.removeEventListener("popstate", this.onPopState);
+	}
+
 
 	private saveLastPanelInView = (next:MyRoute,prev?:MyRoute) => {
 		this.lastPanelInView[next.getViewId()] = next.getPanelId();

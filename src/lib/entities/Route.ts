@@ -147,10 +147,18 @@ export class Route {
 	}
 
 	out() {
-
+		if (!this.hasOverlay()) {
+			if (this.structure.leaveCallback) {
+				this.structure.leaveCallback(this)
+			}
+		}
 	}
 
 	in() {
-
+		if (!this.hasOverlay()) {
+			if (this.structure.enterCallback) {
+				this.structure.enterCallback(this)
+			}
+		}
 	}
 }

@@ -19,6 +19,14 @@ export function getGlobalRouter():Router {
 	return globalRouter;
 }
 
+export function dangerousResetGlobalRouterUseForTestOnly() {
+	if (globalRouter) {
+		globalRouter.stop()
+		window.history.pushState(null, "", "")
+	}
+	globalRouter = null
+}
+
 export function pushPage(pageId: string, params: PageParams = {}) {
 	return getGlobalRouter().pushPage(pageId, params)
 }
