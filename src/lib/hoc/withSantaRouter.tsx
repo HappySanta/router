@@ -8,7 +8,7 @@ export interface WithSantaRouterProps {
     route: Route,
 }
 
-export function withSantaRouter<T>(Component: ComponentType<T & WithSantaRouterProps>) {
+export function withSantaRouter<T>(Component: ComponentType<T>):ComponentType<WithSantaRouterProps & T> {
     function withSantaRouter(props: T) {
         const router = useContext(RouterContext);
         if (!router) throw new Error("Use withSantaRouter without context");
@@ -22,8 +22,7 @@ export function withSantaRouter<T>(Component: ComponentType<T & WithSantaRouterP
                 router.off("update", fn);
             }
         }, []);
-        // @ts-ignore
-        return <Component routeState={route[1]} route={route[0]} {...props}/>;
+        return <Component {...props} routeState={route[1]} route={route[0]}/>;
     }
     return withSantaRouter;
 }

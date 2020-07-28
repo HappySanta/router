@@ -69,6 +69,10 @@ export function getCurrentRouterState() {
 	return getGlobalRouter().getCurrentStateOrDef();
 }
 
+export function getCurrentRoute():Route {
+	return getGlobalRouter().getCurrentRouteOrDef();
+}
+
 export function getViewHistory(route:Route, viewId:string):string[] {
 	const state = getCurrentRouterState();
 	if (route.getViewId() === viewId) {

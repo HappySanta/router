@@ -8,9 +8,15 @@
     "declaration": true,
     "outDir": "./dist",
     "esModuleInterop": true,
-    "jsx": "react"
+    "jsx": "react",
+    "noUnusedLocals": true,
+    "noImplicitThis": true,
+    "noImplicitReturns": true,
+    "noImplicitAny": true,
+    "noFallthroughCasesInSwitch": true
   },
   "include": [
     "src"
-  ]
+  ],
+  "exclude": ["node_modules", "**/*.spec.ts"]
 }

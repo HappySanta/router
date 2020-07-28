@@ -39,6 +39,9 @@ export class Router extends EventEmitter<{
 		super();
 		this.routes = routes;
 		this.history = new History();
+		if (routerConfig) {
+			this.config = routerConfig;
+		}
 	}
 
 	start() {
@@ -155,7 +158,7 @@ export class Router extends EventEmitter<{
 		return this.config.enableErrorThrowing;
 	}
 
-	log(msg: string, ...args:any) {
+	log(...args:any) {
 		if (!this.config.enableLogging) {
 			return
 		}
