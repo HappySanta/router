@@ -2,6 +2,9 @@
 
 Роутер для приложений на VKUI
 
+причины создания этой поделки описаный в статье
+https://vk.com/@-197036977-navigaciya-mini-apps-vkui
+
 пример приложения с роутером
 https://github.com/HappySanta/router-example/tree/master/src
 
