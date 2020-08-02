@@ -8,6 +8,32 @@ https://vk.com/@-197036977-navigaciya-mini-apps-vkui
 пример приложения с роутером
 https://github.com/HappySanta/router-example/tree/master/src
 
+## Changelog
+
+**0.0.7**
+
+Добавлено новое поле в событие ```update``` ```isNewRoute:boolean```.
+
+`true` - когда событие вызвано после методов `push*` `replace*`
+
+`false`- когда событие вызвано переходом по истории назад или вперед
+
+Это поле нужно использовать когда в событии `update` находится логика загрузки данных для предотвращения повторной загрузки когда осуществляется переход назад.
+
+```ts
+getGlobalRouter().on("update", (next:Route, old:Route|undefined, isNewRoute:boolean) => {
+    if (isNewRoute) {
+	  // Переход на новый экран после методов pushPage replacePage  
+    } else {
+	  // Переход назад popPage или бразурные кнопки
+    }
+    console.log("new route id", next)
+    if (old) {
+        console.log("old route was", old)
+    }
+})
+``` 
+
 ## Как использовать
 
 ### Определить роуты 
@@ -74,13 +100,18 @@ startGlobalRouter(routes)
 ### Подписаться на изменения роута
 
 ```ts
-getGlobalRouter().on("update", (next:Route, old?:Route) => {
-	console.log("new route id", next)
-	if (old) {
-		console.log("old route was", old)
-	}
+getGlobalRouter().on("update", (next:Route, old:Route|undefined, isNewRoute:boolean) => {
+    if (isNewRoute) {
+	  // Переход на новый экран после методов pushPage replacePage  
+    } else {
+	  // Переход назад popPage или бразурные кнопки
+    }
+    console.log("new route id", next)
+    if (old) {
+        console.log("old route was", old)
+    }
 })
-```
+``` 
 
 или можно сделать это там где определяем роуты
 
@@ -105,4 +136,28 @@ export const routes: { [key: string]: Page } = {
 
 1) Пометить роут как ```makeInfinity```
 2) использовать ````getViewHistoryWithLastPanel```` для получения списков панелей которые надо отрендерить
-3) ```isInfinityPanel(panelId)``` и ```getInfinityPanelId(panelId)``` чтобы понять какой компонент рендерить    
+3) ```isInfinityPanel(panelId)``` и ```getInfinityPanelId(panelId)``` чтобы понять какой компонент рендерить
+
+
+## Ограничения
+
+Нельзя вызвать синхронно методы роутера одни за другим
+```js
+pushPage("/")
+pushPage("/user")
+popPage()
+replacePage("/info")
+```    
+
+Сейчас такой код не будет работать корректно (планируем исправить в будущем), если очень надо вызвать методы подряд то надо сделать это с небольшой задержкой. 
+
+Например так:
+```js
+pushPage("/")
+await delay(10)
+pushPage("/user")
+await delay(10)
+popPage()
+await delay(10)
+replacePage("/info")
+ ```

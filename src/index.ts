@@ -1,6 +1,7 @@
 export * from "./lib/entities/Page";
 export * from "./lib/entities/Route";
 export * from "./lib/entities/Router";
+export * from "./lib/entities/History";
 export * from "./lib/entities/RouterContext";
 export * from "./lib/const";
 export * from "./lib/methods";

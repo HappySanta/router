@@ -1,15 +1,16 @@
 {
   "name": "@happysanta/router",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "jsnext:main": "src/index.ts",
   "scripts": {
     "build": "tsc && ./node_modules/.bin/babel src --out-dir dist --extensions '.ts,.tsx'",
-    "test": "jest"
+    "test": "jest",
+    "publish": "yarn run test && yarn run build && yarn publish"
   },
   "author": "happysanta",
-  "description": "Router for VK Mini Apps",
+  "description": "Router for VKUI",
   "license": "MIT",
   "keywords": [
     "happysata",
