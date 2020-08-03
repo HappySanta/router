@@ -20,32 +20,51 @@ export class Router extends EventEmitter<{
   unknown: (newRoute: MyRoute, oldRoute?: MyRoute) => void,
   enter: (newRoute: MyRoute, oldRoute?: MyRoute) => void,
 }> {
-  defaultPage: string = PAGE_MAIN;
-  defaultView: string = VIEW_MAIN;
-  defaultPanel: string = PANEL_MAIN;
-  defaultRoot: string = ROOT_MAIN;
 
-  config: RouterConfig = {
-    enableLogging: false,
-    enableErrorThrowing: false,
-  };
-  routes: RouteList = {};
-  history: History;
-  deferOnGoBack: (() => void) | null = null;
-  startHistoryOffset: number = 0;
-  lastPanelInView: { [key: string]: string } = {};
-  replacerUnknownRoute: ReplaceUnknownRouteFn = r => r;
-  private stated: boolean = false;
+	routes: RouteList = {};
+	history: History;
+	deferOnGoBack: (() => void) | null = null;
+	startHistoryOffset: number = 0;
+	lastPanelInView: {[key:string]:string} = {};
+	replacerUnknownRoute: ReplaceUnknownRouteFn = r => r;
+	private stated: boolean = false;
 
+	enableLogging:boolean = false;
+	enableErrorThrowing:boolean = false;
+	defaultPage:string = PAGE_MAIN;
+	defaultRoot:string = ROOT_MAIN;
+	defaultView:string = VIEW_MAIN;
+	defaultPanel:string = PANEL_MAIN;
+	noSlash:boolean = false;
 
-  constructor(routes: RouteList, routerConfig: RouterConfig | null = null) {
-    super();
-    this.routes = routes;
-    this.history = new History();
-    if (routerConfig) {
-      this.config = routerConfig;
-    }
-  }
+	constructor(routes: RouteList, routerConfig: RouterConfig | null = null) {
+		super();
+		this.routes = routes;
+		this.history = new History();
+		if (routerConfig) {
+			if (routerConfig.enableLogging !== undefined) {
+				this.enableLogging = routerConfig.enableLogging;
+			}
+			if (routerConfig.enableErrorThrowing !== undefined) {
+				this.enableErrorThrowing = routerConfig.enableErrorThrowing;
+			}
+			if (routerConfig.defaultPage !== undefined) {
+				this.defaultPage = routerConfig.defaultPage;
+			}
+			if (routerConfig.defaultRoot !== undefined) {
+				this.defaultRoot = routerConfig.defaultRoot;
+			}
+			if (routerConfig.defaultView !== undefined) {
+				this.defaultView = routerConfig.defaultView;
+			}
+			if (routerConfig.defaultPanel !== undefined) {
+				this.defaultPanel = routerConfig.defaultPanel;
+			}
+			if (routerConfig.noSlash !== undefined) {
+        this.noSlash = routerConfig.noSlash;
+      }
+		}
+	}
 
   start() {
     if (this.stated) {
@@ -164,16 +183,16 @@ export class Router extends EventEmitter<{
     }
   }
 
-  isErrorThrowingEnabled() {
-    return this.config.enableErrorThrowing;
-  }
+	isErrorThrowingEnabled() {
+		return this.enableErrorThrowing;
+	}
 
-  log(...args: any) {
-    if (!this.config.enableLogging) {
-      return
-    }
-    console.log.apply(this, args)
-  }
+	log(...args:any) {
+		if (!this.enableLogging) {
+			return
+		}
+		console.log.apply(this, args)
+	}
 
 
   /**
@@ -323,13 +342,18 @@ export class Router extends EventEmitter<{
     }
   }
 
-  getDefaultRoute(location: string, params: PageParams) {
-    return new MyRoute(new Page(this.defaultPanel, this.defaultView, this.defaultRoot), location, PAGE_MAIN, params);
-  }
+	getDefaultRoute(location: string, params: PageParams) {
+		return new MyRoute(
+			new Page(this.defaultPanel, this.defaultView, this.defaultRoot),
+			location,
+			this.defaultPage,
+			params,
+		);
+	}
 
   createRouteFromLocation(location: string): MyRoute {
     try {
-      return MyRoute.fromLocation(this.routes, location)
+      return MyRoute.fromLocation(this.routes, location, this.noSlash)
     } catch (e) {
       if (e && e.message === 'ROUTE_NOT_FOUND') {
         return this.getDefaultRoute(location, MyRoute.getParamsFromPath(location))

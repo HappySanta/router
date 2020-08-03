@@ -1,13 +1,14 @@
 import {PageParams, RouteList, Router} from "./entities/Router";
 import {Route} from "./entities/Route";
+import {RouterConfig} from "./entities/RouterConfig";
 
 let globalRouter: Router|null = null;
 
-export function startGlobalRouter(routes: RouteList):Router {
+export function startGlobalRouter(routes: RouteList, config: RouterConfig|null = null):Router {
 	if (globalRouter) {
 		throw new Error('startGlobalRouter called twice is not allowed')
 	}
-	globalRouter = new Router(routes);
+	globalRouter = new Router(routes, config);
 	globalRouter.start();
 	return globalRouter;
 }

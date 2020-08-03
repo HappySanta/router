@@ -47,10 +47,16 @@ export class Route {
 	/**
 	 * @param {RouteList} routeList
 	 * @param location "info?w=about&show=1" то, что лежит в window.location.hash
+	 * @param noSlash
 	 */
-	static fromLocation(routeList: RouteList, location: string) {
+	static fromLocation(routeList: RouteList, location: string, noSlash: boolean) {
 		const params = Route.getParamsFromPath(location);
-		location = location.replace("#", '').split("?", 2).shift() || "";
+		location = location.replace("#", '');
+		if (noSlash && location.length && location[0] !== '/') {
+			 location = '/' + location
+		}
+		location = location.split("?", 2).shift() || "";
+
 		let match: null | MatchInterface = null;
 		for (let pageId in routeList) {
 			if (routeList.hasOwnProperty(pageId)) {
