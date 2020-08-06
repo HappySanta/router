@@ -8,5 +8,6 @@ export * from "./lib/methods";
 export * from "./lib/hoc/withSantaRouter";
 export * from "./lib/hoc/withThrottlingRouter";
 export * from "./lib/hooks/useHomePageCheck";
+export * from "./lib/hooks/useFirstPageCheck";
 export * from "./lib/hooks/useRoute";
 export * from "./lib/hooks/useRouteState";

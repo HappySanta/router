@@ -45,3 +45,45 @@ test('route basic usage', async (done) => {
     done()
   }, 10 )
 })
+
+
+test('route first page push', async (done) => {
+  const r = new Router({
+    "/":new Page(),
+    "/user": new Page("user"),
+    "/info": new Page("info"),
+  }, null)
+
+  r.start()
+  await delay(100)
+  expect(r.isFirstPage()).toBe(true) // После старта страница всегда first
+  r.pushPage("/info")
+  await delay(100)
+  expect(r.isFirstPage()).toBe(false) // После push страница всегда не будет first
+  r.popPage()
+  await delay(100)
+  expect(r.isFirstPage()).toBe(true) // Вернулись назад на первую страницу, она была и осталась first
+  done()
+})
+
+test('route first page replace', async (done) => {
+  const r = new Router({
+    "/":new Page(),
+    "/user": new Page("user"),
+    "/info": new Page("info"),
+  }, null)
+
+  r.start()
+  await delay(100)
+  expect(r.isFirstPage()).toBe(true) // После старта страница всегда first
+  r.replacePage("/info")
+  await delay(100)
+  expect(r.isFirstPage()).toBe(true) // Мы заменили first страницу на какую-то другу, она осталась first
+  r.pushPage("/user")
+  await delay(100)
+  expect(r.isFirstPage()).toBe(false) // Был push страница уже не first
+  r.popPage()
+  await delay(100)
+  expect(r.isFirstPage()).toBe(true) // Вернулись обратно на first страницу
+  done()
+})

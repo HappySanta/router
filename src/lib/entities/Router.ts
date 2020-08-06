@@ -200,7 +200,7 @@ export class Router extends EventEmitter<{
    */
   isFirstPage(): boolean {
     const state = this.getCurrentStateOrDef();
-    return state.blank === 1;
+    return state.first === 1;
   }
 
   pushPage(pageId: string, params: PageParams = {}) {
