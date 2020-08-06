@@ -8,7 +8,7 @@ import {
   pushPage,
   startGlobalRouter
 } from "./methods";
-import { Page } from "./entities/Page";
+import {Page} from "./entities/Page";
 import {RouteList} from "./entities/Router";
 
 
@@ -27,7 +27,7 @@ test('route basic usage', () => {
   expect(r.getPageId()).toBe(MAIN_PAGE)
   expect(r.getPanelId()).toBe(MAIN_PANEL)
 
-  pushPage(USER_PAGE, {id:"15"})
+  pushPage(USER_PAGE, {id: "15"})
   const r1 = getCurrentRoute();
   expect(r1.getPageId()).toBe(USER_PAGE);
   expect(r1.getPanelId()).toBe(USER_PANEL);
@@ -54,7 +54,7 @@ test('route basic with enter leave callback', (done) => {
   expect(r.getPageId()).toBe(MAIN_PAGE)
   expect(r.getPanelId()).toBe(MAIN_PANEL)
 
-  pushPage(USER_PAGE, {id:"15"})
+  pushPage(USER_PAGE, {id: "15"})
   const r1 = getCurrentRoute();
   expect(r1.getPageId()).toBe(USER_PAGE);
   expect(r1.getPanelId()).toBe(USER_PANEL);
@@ -62,11 +62,11 @@ test('route basic with enter leave callback', (done) => {
 
   popPage()
 
-  setTimeout( () => {
+  setTimeout(() => {
     expect(mainEnterCalls).toBe(1 + 1)
     expect(mainLeaveCalls).toBe(1)
     expect(userEnterCalls).toBe(1)
     expect(userLeaveCalls).toBe(1)
     done()
-  }, 10 )
+  }, 10)
 });

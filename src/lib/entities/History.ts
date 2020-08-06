@@ -6,7 +6,7 @@ export const HISTORY_UPDATE_PUSH: HistoryUpdateType = "PUSH";
 export const HISTORY_UPDATE_REPLACE: HistoryUpdateType = "REPLACE";
 export const HISTORY_UPDATE_MOVE: HistoryUpdateType = "MOVE";
 
-export type UpdateEventType = [Route, Route|undefined, boolean, HistoryUpdateType];
+export type UpdateEventType = [Route, Route | undefined, boolean, HistoryUpdateType];
 
 
 export class History {

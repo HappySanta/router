@@ -7,20 +7,20 @@ import {Page} from "./Page";
 import {Route} from "./Route";
 
 function delay(time = 100) {
-  return new Promise(resolve => setTimeout(resolve,time))
+  return new Promise(resolve => setTimeout(resolve, time))
 }
 
 test('route basic usage', async (done) => {
   const r = new Router({
-    "/":new Page(),
+    "/": new Page(),
     "/user": new Page("user"),
     "/info": new Page("info"),
   }, null)
 
-  const recordEvents:{newRoute:Route, oldRoute:Route|undefined, isNewRoute:boolean, type: HistoryUpdateType}[] = []
+  const recordEvents: { newRoute: Route, oldRoute: Route | undefined, isNewRoute: boolean, type: HistoryUpdateType }[] = []
 
   r.on("update", ((newRoute, oldRoute, isNewRoute, type) => {
-    recordEvents.push({newRoute,oldRoute,isNewRoute, type})
+    recordEvents.push({newRoute, oldRoute, isNewRoute, type})
   }))
 
   r.start()
@@ -34,7 +34,7 @@ test('route basic usage', async (done) => {
   r.replacePage("/info")
   await delay(10)
 
-  setTimeout( () => {
+  setTimeout(() => {
     // одно событие update приходит после старта роутера
     expect(recordEvents.length).toBe(4 + 1)
     expect(recordEvents[0].isNewRoute).toBeTruthy()
@@ -43,13 +43,13 @@ test('route basic usage', async (done) => {
     expect(recordEvents[3].isNewRoute).toBeFalsy()
     expect(recordEvents[4].isNewRoute).toBeTruthy()
     done()
-  }, 10 )
+  }, 10)
 })
 
 
 test('route first page push', async (done) => {
   const r = new Router({
-    "/":new Page(),
+    "/": new Page(),
     "/user": new Page("user"),
     "/info": new Page("info"),
   }, null)
@@ -68,7 +68,7 @@ test('route first page push', async (done) => {
 
 test('route first page replace', async (done) => {
   const r = new Router({
-    "/":new Page(),
+    "/": new Page(),
     "/user": new Page("user"),
     "/info": new Page("info"),
   }, null)
