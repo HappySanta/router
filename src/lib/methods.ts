@@ -20,6 +20,10 @@ export function getGlobalRouter(): Router {
   return globalRouter;
 }
 
+export function setGlobalRouter(router:Router) {
+  globalRouter = router
+}
+
 export function dangerousResetGlobalRouterUseForTestOnly() {
   if (globalRouter) {
     globalRouter.stop()
