@@ -36,6 +36,16 @@ getGlobalRouter().on("update", (next:Route, old:Route|undefined, isNewRoute:bool
 
 ## Как использовать
 
+### Install
+
+```bash
+npm i @happysanta/router
+```
+
+```bash
+yarn add @happysanta/router
+```
+
 ### Определить роуты 
 
 ```ts
@@ -47,6 +57,14 @@ const routes = {
   [PAGE_MAIN]: new Page(),
   [PAGE_PRODUCT]: new Page(PANEL_PRODUCT),
 }
+```
+
+### Обернуть все приложение
+
+```ts
+<RouterContext.Provider value={router}>
+	<App/>
+</RouterContext.Provider>
 ```
 
 ### startGlobalRouter
