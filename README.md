@@ -8,54 +8,29 @@ https://vk.com/@-197036977-navigaciya-mini-apps-vkui
 пример приложения с роутером
 https://github.com/HappySanta/router-example/tree/master/src
 
-## Changelog
-
-**0.0.7**
-
-Добавлено новое поле в событие ```update``` ```isNewRoute:boolean```.
-
-`true` - когда событие вызвано после методов `push*` `replace*`
-
-`false`- когда событие вызвано переходом по истории назад или вперед
-
-Это поле нужно использовать когда в событии `update` находится логика загрузки данных для предотвращения повторной загрузки когда осуществляется переход назад.
-
-```ts
-getGlobalRouter().on("update", (next:Route, old:Route|undefined, isNewRoute:boolean) => {
-    if (isNewRoute) {
-	  // Переход на новый экран после методов pushPage replacePage  
-    } else {
-	  // Переход назад popPage или бразурные кнопки
-    }
-    console.log("new route id", next)
-    if (old) {
-        console.log("old route was", old)
-    }
-})
-``` 
-
 ## Как использовать
 
 ### Определить роуты 
 
 ```ts
+import {Page, Router} from "@happysanta/router"
+
 const PAGE_MAIN = '/'
 const PAGE_PRODUCT = '/product/:id([0-9]+)'
 
+const PANEL_MAIN = "panel_main"
 const PANEL_PRODUCT = "panel_product"
-const routes = {
-  [PAGE_MAIN]: new Page(),
-  [PAGE_PRODUCT]: new Page(PANEL_PRODUCT),
+
+const VIEW_MAIN = "view_main"
+
+const routes: { [key: string]: Page } = {
+  [PAGE_MAIN]: new Page(PANEL_MAIN,VIEW_MAIN),
+  [PAGE_PRODUCT]: new Page(PANEL_PRODUCT,VIEW_MAIN),
 }
+
+const router = new Router(routes)
+setGlobalRouter(router)
 ```
-
-### startGlobalRouter
-
-```ts
-startGlobalRouter(routes)
-```
-вызвать функцию в сама начале приложения еще до первого рендера
-
 
 ### HOC withSantaRouter
 
@@ -161,3 +136,43 @@ popPage()
 await delay(10)
 replacePage("/info")
  ```
+
+
+## Changelog
+
+**0.1.0**
+
+Добавлены методы 
+
+```ts
+router.onEnterPage('/', () => { console.log('enter on main page') })
+router.onLeavePage('/', () => { console.log('leave from main page') })
+```
+
+Удалены `rootId` из `Page`
+
+Оставлены хуки и hoc: `withRouter` `withThrottlingRouter` `useRouter` `useFirstPageCheck` `useParams`
+
+**0.0.7**
+
+Добавлено новое поле в событие ```update``` ```isNewRoute:boolean```.
+
+`true` - когда событие вызвано после методов `push*` `replace*`
+
+`false`- когда событие вызвано переходом по истории назад или вперед
+
+Это поле нужно использовать когда в событии `update` находится логика загрузки данных для предотвращения повторной загрузки когда осуществляется переход назад.
+
+```ts
+getGlobalRouter().on("update", (next:Route, old:Route|undefined, isNewRoute:boolean) => {
+    if (isNewRoute) {
+	  // Переход на новый экран после методов pushPage replacePage  
+    } else {
+	  // Переход назад popPage или бразурные кнопки
+    }
+    console.log("new route id", next)
+    if (old) {
+        console.log("old route was", old)
+    }
+})
+``` 

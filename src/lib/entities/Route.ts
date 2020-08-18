@@ -17,15 +17,13 @@ export class Route {
    * @type {Page}
    */
   structure: Page;
-  location: string;
   pageId: string;
   params: PageParams = {};
   uniqId: number;
 
 
-  constructor(structure: Page, location: string, pageId: string, params: PageParams) {
+  constructor(structure: Page, pageId: string, params: PageParams) {
     this.structure = structure;
-    this.location = location;
     this.pageId = pageId;
     this.params = params;
     this.uniqId = getNextUniqId();
@@ -71,7 +69,7 @@ export class Route {
     if (!ps) {
       throw new Error("Router fail: cant find structure in routes for " + location)
     }
-    return new Route(ps, location, match.path, {...params, ...match.params});
+    return new Route(ps, match.path, {...params, ...match.params});
   }
 
   static fromPageId(routeList: RouteList, pageId: string, params?: PageParams) {
@@ -79,11 +77,11 @@ export class Route {
     if (!ps) {
       throw new Error("Router fail: cant find structure in routes for " + pageId)
     }
-    return new Route(ps, generatePath(pageId, params), pageId, params || ({} as PageParams))
+    return new Route(ps, pageId, params || ({} as PageParams))
   }
 
   clone(): Route {
-    const copy = new Route(this.structure.clone(), this.location, this.pageId, {...this.params});
+    const copy = new Route(this.structure.clone(), this.pageId, {...this.params});
     copy.uniqId = this.uniqId;
     return copy;
   }
@@ -111,11 +109,7 @@ export class Route {
     return this.structure.viewId
   }
 
-  getRootId() {
-    return this.structure.rootId
-  }
-
-  getParams():PageParams {
+  getParams(): PageParams {
     return this.params
   }
 
@@ -155,18 +149,10 @@ export class Route {
   }
 
   out() {
-    if (!this.hasOverlay()) {
-      if (this.structure.leaveCallback) {
-        this.structure.leaveCallback(this)
-      }
-    }
+
   }
 
   in() {
-    if (!this.hasOverlay()) {
-      if (this.structure.enterCallback) {
-        this.structure.enterCallback(this)
-      }
-    }
+
   }
 }

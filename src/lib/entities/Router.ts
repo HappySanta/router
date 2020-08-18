@@ -5,7 +5,7 @@ import {preventBlinkingBySettingScrollRestoration} from "../tools";
 import {State, stateFromLocation} from "./State";
 import {EventEmitter} from "tsee";
 
-import {PAGE_MAIN, PANEL_MAIN, ROOT_MAIN, VIEW_MAIN} from "../const";
+import {PAGE_MAIN, PANEL_MAIN, VIEW_MAIN} from "../const";
 import {RouterConfig} from "./RouterConfig";
 
 export declare type RouteList = { [key: string]: Page }
@@ -13,12 +13,13 @@ export declare type ReplaceUnknownRouteFn = (newRoute: MyRoute, oldRoute?: MyRou
 export declare type PageParams = { [key: string]: string | number }
 
 export declare type HistoryUpdateType = "PUSH" | "REPLACE" | "MOVE";
-
+export declare type UpdateEventFn = (newRoute: MyRoute, oldRoute: MyRoute | undefined, isNewRoute: boolean, type: HistoryUpdateType) => void
+export declare type EnterEventFn = (newRoute: MyRoute, oldRoute?: MyRoute) => void
+export declare type LeaveEventFn = (newRoute: MyRoute, oldRoute: MyRoute, isNewRoute: boolean, type: HistoryUpdateType) => void
 
 export class Router extends EventEmitter<{
-  update: (newRoute: MyRoute, oldRoute: MyRoute | undefined, isNewRoute: boolean, type: HistoryUpdateType) => void,
-  unknown: (newRoute: MyRoute, oldRoute?: MyRoute) => void,
-  enter: (newRoute: MyRoute, oldRoute?: MyRoute) => void,
+  update: UpdateEventFn,
+  enter: EnterEventFn,
 }> {
 
   routes: RouteList = {};
@@ -29,7 +30,6 @@ export class Router extends EventEmitter<{
   enableLogging: boolean = false;
   enableErrorThrowing: boolean = false;
   defaultPage: string = PAGE_MAIN;
-  defaultRoot: string = ROOT_MAIN;
   defaultView: string = VIEW_MAIN;
   defaultPanel: string = PANEL_MAIN;
   alwaysStartWithSlash: boolean = true;
@@ -49,9 +49,6 @@ export class Router extends EventEmitter<{
       if (routerConfig.defaultPage !== undefined) {
         this.defaultPage = routerConfig.defaultPage;
       }
-      if (routerConfig.defaultRoot !== undefined) {
-        this.defaultRoot = routerConfig.defaultRoot;
-      }
       if (routerConfig.defaultView !== undefined) {
         this.defaultView = routerConfig.defaultView;
       }
@@ -62,6 +59,14 @@ export class Router extends EventEmitter<{
         this.alwaysStartWithSlash = routerConfig.noSlash;
       }
     }
+  }
+
+  private static back() {
+    window.history.back();
+  }
+
+  private static backTo(x: number) {
+    window.history.go(x);
   }
 
   replacerUnknownRoute: ReplaceUnknownRouteFn = r => r;
@@ -82,11 +87,6 @@ export class Router extends EventEmitter<{
       this.emit("enter", nextRoute, this.history.getCurrentRoute());
       state.history = [nextRoute.getPanelId()]
     }
-    // при старте роутера у currentRoute не должен вызываться колбек onLeave
-    // потому что небыло перехода с экрана
-    const currentRoute = nextRoute.clone()
-    currentRoute.structure.leaveCallback = null
-    this.history.init(currentRoute, state);
     this.replace(state, nextRoute);
     window.removeEventListener("popstate", this.onPopState);
     window.addEventListener("popstate", this.onPopState);
@@ -294,8 +294,7 @@ export class Router extends EventEmitter<{
 
   getDefaultRoute(location: string, params: PageParams) {
     return new MyRoute(
-      new Page(this.defaultPanel, this.defaultView, this.defaultRoot),
-      location,
+      new Page(this.defaultPanel, this.defaultView),
       this.defaultPage,
       params,
     );
@@ -317,76 +316,6 @@ export class Router extends EventEmitter<{
     if (currentRoute.isPopup() || currentRoute.isModal()) {
       this.log("popPageIfModalOrPopup");
       Router.back();
-    }
-  }
-
-  private saveLastPanelInView = (next: MyRoute, prev?: MyRoute) => {
-    this.lastPanelInView[next.getViewId()] = next.getPanelId();
-    if (prev) {
-      this.lastPanelInView[prev.getViewId()] = prev.getPanelId();
-    }
-  };
-
-  private onPopState = () => {
-    if (this.deferOnGoBack) {
-      this.log("onPopStateInDefer");
-      this.deferOnGoBack();
-      this.deferOnGoBack = null;
-      return
-    }
-
-    let nextRoute = this.createRouteFromLocationWithReplace();
-    const state = stateFromLocation(this.history.getCurrentIndex());
-    if (state.blank === 1) {
-      state.index = this.history.getCurrentIndex();
-      state.history = [nextRoute.getPanelId()];
-      this.emit("enter", nextRoute, this.history.getCurrentRoute());
-      this.emit("update", ...this.history.push(nextRoute, state));
-      window.history.replaceState(state, "page=" + state.index, '#' + nextRoute.getLocation());
-    } else {
-      this.emit("update", ...this.history.setCurrentIndex(state.index));
-    }
-
-    this.log("onPopState", [nextRoute, this.history.getCurrentRoute(), state]);
-  };
-
-  private replace(state: State, nextRoute: MyRoute) {
-    state.length = window.history.length;
-    state.index = this.history.getCurrentIndex();
-    state.blank = 0;
-    this.emit("update", ...this.history.replace(nextRoute, state));
-    window.history.replaceState(state, "page=" + state.index, '#' + nextRoute.getLocation());
-    preventBlinkingBySettingScrollRestoration();
-  }
-
-  private push(state: State, nextRoute: MyRoute) {
-    state.length = window.history.length;
-    state.blank = 0;
-    state.first = 0;
-    this.emit("update", ...this.history.push(nextRoute, state));
-    state.index = this.history.getCurrentIndex();
-    window.history.pushState(state, "page=" + state.index, '#' + nextRoute.getLocation());
-    preventBlinkingBySettingScrollRestoration();
-  }
-
-  private static back() {
-    window.history.back();
-  }
-
-  private static backTo(x: number) {
-    window.history.go(x);
-  }
-
-  private createRouteFromLocationWithReplace() {
-    const location = window.location.hash
-    try {
-      return MyRoute.fromLocation(this.routes, location, this.alwaysStartWithSlash)
-    } catch (e) {
-      if (e && e.message === 'ROUTE_NOT_FOUND') {
-        const def = this.getDefaultRoute(location, MyRoute.getParamsFromPath(location))
-        return this.replacerUnknownRoute(def, this.history.getCurrentRoute())
-      }
-      throw e
     }
   }
 
@@ -447,7 +376,7 @@ export class Router extends EventEmitter<{
     return this.getRoute().getPopupId()
   }
 
-  public getParams():PageParams {
+  public getParams(): PageParams {
     return this.getRoute().getParams()
   }
 
@@ -455,4 +384,106 @@ export class Router extends EventEmitter<{
     return this.getRoute().hasOverlay()
   }
 
+  private saveLastPanelInView = (next: MyRoute, prev?: MyRoute) => {
+    this.lastPanelInView[next.getViewId()] = next.getPanelId();
+    if (prev) {
+      this.lastPanelInView[prev.getViewId()] = prev.getPanelId();
+    }
+  };
+
+  private onPopState = () => {
+    if (this.deferOnGoBack) {
+      this.log("onPopStateInDefer");
+      this.deferOnGoBack();
+      this.deferOnGoBack = null;
+      return
+    }
+
+    let nextRoute = this.createRouteFromLocationWithReplace();
+    const state = stateFromLocation(this.history.getCurrentIndex());
+    if (state.blank === 1) {
+      state.index = this.history.getCurrentIndex();
+      state.history = [nextRoute.getPanelId()];
+      this.emit("enter", nextRoute, this.history.getCurrentRoute());
+      this.emit("update", ...this.history.push(nextRoute, state));
+      window.history.replaceState(state, "page=" + state.index, '#' + nextRoute.getLocation());
+    } else {
+      this.emit("update", ...this.history.setCurrentIndex(state.index));
+    }
+
+    this.log("onPopState", [nextRoute, this.history.getCurrentRoute(), state]);
+  };
+
+  private replace(state: State, nextRoute: MyRoute) {
+    state.length = window.history.length;
+    state.index = this.history.getCurrentIndex();
+    state.blank = 0;
+    this.emit("update", ...this.history.replace(nextRoute, state));
+    window.history.replaceState(state, "page=" + state.index, '#' + nextRoute.getLocation());
+    preventBlinkingBySettingScrollRestoration();
+  }
+
+  private push(state: State, nextRoute: MyRoute) {
+    state.length = window.history.length;
+    state.blank = 0;
+    state.first = 0;
+    this.emit("update", ...this.history.push(nextRoute, state));
+    state.index = this.history.getCurrentIndex();
+    window.history.pushState(state, "page=" + state.index, '#' + nextRoute.getLocation());
+    preventBlinkingBySettingScrollRestoration();
+  }
+
+  private createRouteFromLocationWithReplace() {
+    const location = window.location.hash
+    try {
+      return MyRoute.fromLocation(this.routes, location, this.alwaysStartWithSlash)
+    } catch (e) {
+      if (e && e.message === 'ROUTE_NOT_FOUND') {
+        const def = this.getDefaultRoute(location, MyRoute.getParamsFromPath(location))
+        return this.replacerUnknownRoute(def, this.history.getCurrentRoute())
+      }
+      throw e
+    }
+  }
+
+
+  /**
+   * @param pageId
+   * @param fn
+   * @return unsubscribe function
+   */
+  onEnterPage(pageId:string, fn:UpdateEventFn):() => void {
+    const _fn = (newRoute: MyRoute, oldRoute: MyRoute | undefined, isNewRoute: boolean, type: HistoryUpdateType) => {
+      if (newRoute.pageId === pageId) {
+        if (!newRoute.hasOverlay()) {
+          fn(newRoute, oldRoute, isNewRoute, type)
+        }
+      }
+    }
+
+    this.on("update", _fn)
+    return () => {
+      this.off("update", _fn)
+    }
+  }
+
+  /**
+   * @param pageId
+   * @param fn
+   * @return unsubscribe function
+   */
+  onLeavePage(pageId:string, fn:LeaveEventFn):() => void {
+    const _fn = (newRoute: MyRoute, oldRoute: MyRoute | undefined, isNewRoute: boolean, type: HistoryUpdateType) => {
+      if (oldRoute && oldRoute.pageId === pageId) {
+        if (!oldRoute.hasOverlay()) {
+          fn(newRoute, oldRoute, isNewRoute, type)
+        }
+      }
+    }
+
+    this.on("update", _fn)
+    return () => {
+      this.off("update", _fn)
+    }
+  }
 }

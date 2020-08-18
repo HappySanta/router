@@ -1,7 +1,6 @@
 import React, {ComponentType} from "react";
 import {Route, Router} from "../..";
 import {State} from "../entities/State";
-import {useRoute} from "../..";
 import {useRouter} from "../hooks/useRouter";
 
 export interface RouterProps {
@@ -34,11 +33,10 @@ export function withSantaRouter<T>(Component: ComponentType<RouterProps & T>): C
 
 
 export function withRouter<T>(Component: ComponentType<RouterProps & T>, withUpdate: boolean = true): ComponentType<T> {
-  function withRouter(props: T) {
-    const route = useRoute(withUpdate)
-    const router = useRouter()
-    return <Component {...props} router={router} routeState={router.getCurrentStateOrDef()} route={route}/>;
+  function WithRouter(props: T) {
+    const router = useRouter(withUpdate)
+    return <Component {...props} router={router} routeState={router.getCurrentStateOrDef()} route={router.getCurrentRouteOrDef()}/>;
   }
 
-  return withRouter;
+  return WithRouter;
 }

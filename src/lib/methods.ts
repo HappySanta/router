@@ -20,7 +20,7 @@ export function getGlobalRouter(): Router {
   return globalRouter;
 }
 
-export function setGlobalRouter(router:Router) {
+export function setGlobalRouter(router: Router) {
   globalRouter = router
 }
 
@@ -68,7 +68,7 @@ export function pushPageAfterPreviews(prevPageId: string, pageId: string, params
   return getGlobalRouter().pushPageAfterPreviews(prevPageId, pageId, params)
 }
 
-export function getLastPanelInView(viewId: string):string|undefined {
+export function getLastPanelInView(viewId: string): string | undefined {
   return getGlobalRouter().getLastPanelInView(viewId)
 }
 
@@ -102,7 +102,7 @@ export function getViewHistoryWithLastPanel(viewId: string): string[] {
   return getGlobalRouter().getViewHistoryWithLastPanel(viewId)
 }
 
-export function getPanelIdInView(viewId: string): string|undefined {
+export function getPanelIdInView(viewId: string): string | undefined {
   return getGlobalRouter().getPanelIdInView(viewId)
 }
 

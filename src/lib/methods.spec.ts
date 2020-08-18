@@ -3,13 +3,12 @@
  */
 import {
   dangerousResetGlobalRouterUseForTestOnly,
-  getCurrentRoute, getCurrentRouteOrDef,
-  popPage,
-  pushPage,
+  getCurrentRoute, getGlobalRouter, popPage,
+  pushPage, setGlobalRouter,
   startGlobalRouter
 } from "./methods";
 import {Page} from "./entities/Page";
-import {RouteList} from "./entities/Router";
+import {RouteList, Router} from "./entities/Router";
 
 
 test('route basic usage', () => {
@@ -45,17 +44,34 @@ test('route basic with enter leave callback', (done) => {
   let mainLeaveCalls = 0
   let userEnterCalls = 0
   let userLeaveCalls = 0
-  startGlobalRouter({
-    [MAIN_PAGE]: new Page(MAIN_PANEL).onEnter(() => mainEnterCalls++).onLeave(() => mainLeaveCalls++),
-    [USER_PAGE]: new Page(USER_PANEL).onEnter(() => userEnterCalls++).onLeave(() => userLeaveCalls++),
-  } as RouteList);
 
-  const r = getCurrentRouteOrDef();
+  const router = new Router({
+    [MAIN_PAGE]: new Page(MAIN_PANEL),
+    [USER_PAGE]: new Page(USER_PANEL),
+  } as RouteList)
+
+  router.onEnterPage(MAIN_PAGE, () => {
+    mainEnterCalls++
+  })
+  router.onLeavePage(MAIN_PAGE, () => {
+    mainLeaveCalls++
+  })
+  router.onEnterPage(USER_PAGE, () => {
+    userEnterCalls++
+  })
+  router.onLeavePage(USER_PAGE, () => {
+    userLeaveCalls++
+  })
+
+  router.start()
+  setGlobalRouter(router)
+
+  const r = getGlobalRouter().getRoute();
   expect(r.getPageId()).toBe(MAIN_PAGE)
   expect(r.getPanelId()).toBe(MAIN_PANEL)
 
   pushPage(USER_PAGE, {id: "15"})
-  const r1 = getCurrentRouteOrDef();
+  const r1 = getGlobalRouter().getRoute();
   expect(r1.getPageId()).toBe(USER_PAGE);
   expect(r1.getPanelId()).toBe(USER_PANEL);
   expect(r1.getParams()).toHaveProperty("id", "15")

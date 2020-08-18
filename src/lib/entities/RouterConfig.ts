@@ -4,6 +4,5 @@ export interface RouterConfig {
   defaultPage?: string,
   defaultView?: string,
   defaultPanel?: string,
-  defaultRoot?: string,
   noSlash?: boolean,
 }

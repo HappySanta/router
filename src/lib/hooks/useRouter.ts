@@ -1,9 +1,10 @@
-import {PageParams, Router, RouterContext} from "../..";
 import {useContext, useEffect, useRef, useState} from "react";
+import {PageParams, Router} from "../entities/Router";
+import {RouterContext} from "../entities/RouterContext"
 
 const useForceUpdate = () => useState<number>(0)[1];
 
-export function useRouter(withUpdate:boolean = true): Router {
+export function useRouter(withUpdate: boolean = true): Router {
   const router = useContext(RouterContext);
   if (!router) throw new Error("Use useRoute without context");
   const forceUpdate = useForceUpdate();
@@ -21,8 +22,8 @@ export function useRouter(withUpdate:boolean = true): Router {
   return router
 }
 
-export function useParams():PageParams {
-    const router = useRouter(false)
-    const params = useRef(router.getParams())
-    return params.current
+export function useParams(): PageParams {
+  const router = useRouter(false)
+  const params = useRef(router.getParams())
+  return params.current
 }

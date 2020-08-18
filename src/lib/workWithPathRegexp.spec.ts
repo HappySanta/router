@@ -1,4 +1,4 @@
-import {matchPath,generatePath} from "./workWithPathRegexp";
+import {generatePath, matchPath} from "./workWithPathRegexp";
 
 test('matchPath / and /', () => {
   expect(!!matchPath('/', '/')).toBe(true)
@@ -34,19 +34,19 @@ test('generatePath simple', () => {
 })
 
 test('generatePath params', () => {
-  expect(generatePath("user/:id", {id:5})).toEqual("user/5")
+  expect(generatePath("user/:id", {id: 5})).toEqual("user/5")
 })
 
 test('generatePath params and slash', () => {
-  expect(generatePath("/user/:id", {id:5})).toEqual("/user/5")
+  expect(generatePath("/user/:id", {id: 5})).toEqual("/user/5")
 })
 
 test('generatePath inline and additional params', () => {
-  expect(generatePath("user/:id", {id:19,name:"Ivan"})).toEqual("user/19?name=Ivan")
+  expect(generatePath("user/:id", {id: 19, name: "Ivan"})).toEqual("user/19?name=Ivan")
 })
 
 test('generatePath only additional params', () => {
-  expect(generatePath("user", {id:19,name:"Ivan"})).toEqual("user?id=19&name=Ivan")
+  expect(generatePath("user", {id: 19, name: "Ivan"})).toEqual("user?id=19&name=Ivan")
 })
 
 test('generatePath edge case 1', () => {
@@ -58,13 +58,13 @@ test('generatePath edge case 2', () => {
 })
 
 test('generatePath edge case 3', () => {
-  expect(generatePath("/:name", {name:"Ivan"})).toEqual("/Ivan")
+  expect(generatePath("/:name", {name: "Ivan"})).toEqual("/Ivan")
 })
 
 test('generatePath edge case 4', () => {
-  expect(generatePath("/:name", {name:"Ivan",id:"9"})).toEqual("/Ivan?id=9")
+  expect(generatePath("/:name", {name: "Ivan", id: "9"})).toEqual("/Ivan?id=9")
 })
 
 test('generatePath edge case 5', () => {
-  expect(generatePath("/", {id:"9"})).toEqual("/?id=9")
+  expect(generatePath("/", {id: "9"})).toEqual("/?id=9")
 })

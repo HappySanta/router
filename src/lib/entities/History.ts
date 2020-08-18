@@ -12,12 +12,7 @@ export type UpdateEventType = [Route, Route | undefined, boolean, HistoryUpdateT
 export class History {
 
   private stack: [Route, State][] = [];
-  private currentIndex: number = -1;
-
-  init(r: Route, s: State) {
-    this.stack = [[r, s]];
-    this.currentIndex = 0;
-  }
+  private currentIndex: number = 0;
 
   push(r: Route, s: State): UpdateEventType {
     const current = this.getCurrentRoute();

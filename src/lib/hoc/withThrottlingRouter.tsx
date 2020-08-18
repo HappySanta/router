@@ -43,7 +43,8 @@ export function withThrottlingRouter<T>(Component: ComponentType<ThrottlingRoute
     const onTransitionEnd = useCallback(() => {
       lastUpdateRouteAt.current = 0
     }, [])
-    return <Component {...props} router={router} onTransitionEnd={onTransitionEnd} routeState={route[1]} route={route[0]}/>;
+    return <Component {...props} router={router} onTransitionEnd={onTransitionEnd} routeState={route[1]}
+                      route={route[0]}/>;
   }
 
   return withThrottlingRouter;
