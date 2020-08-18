@@ -1,10 +1,11 @@
-import React, {useContext, useEffect, useState, ComponentType, useCallback, useRef} from "react";
-import {Route} from "../entities/Route";
+import React, {ComponentType, useCallback, useEffect, useRef, useState} from "react";
+import {Route} from "../..";
 import {State} from "../entities/State";
-import {RouterContext} from "../entities/RouterContext";
-import {SantaRouterProps} from "./withSantaRouter";
 
-export interface ThrottlingRouterProps extends SantaRouterProps {
+import {RouterProps} from "./withRouter";
+import {useRouter} from "../hooks/useRouter";
+
+export interface ThrottlingRouterProps extends RouterProps {
   onTransitionEnd: () => void
 }
 
@@ -13,8 +14,7 @@ const UPDATE_INTERVAL: number = 650
 
 export function withThrottlingRouter<T>(Component: ComponentType<ThrottlingRouterProps & T>): ComponentType<T> {
   function withThrottlingRouter(props: T) {
-    const router = useContext(RouterContext);
-    if (!router) throw new Error("Use withThrottlingRouter without context");
+    const router = useRouter()
     const [route, setRoute] = useState<[Route, State]>([router.getCurrentRouteOrDef(), router.getCurrentStateOrDef()]);
     const lastUpdateRouteAt = useRef(0)
     const updateTimer = useRef(0)
@@ -43,7 +43,7 @@ export function withThrottlingRouter<T>(Component: ComponentType<ThrottlingRoute
     const onTransitionEnd = useCallback(() => {
       lastUpdateRouteAt.current = 0
     }, [])
-    return <Component {...props} onTransitionEnd={onTransitionEnd} routeState={route[1]} route={route[0]}/>;
+    return <Component {...props} router={router} onTransitionEnd={onTransitionEnd} routeState={route[1]} route={route[0]}/>;
   }
 
   return withThrottlingRouter;

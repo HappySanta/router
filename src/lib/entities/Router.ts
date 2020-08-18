@@ -32,7 +32,7 @@ export class Router extends EventEmitter<{
   defaultRoot: string = ROOT_MAIN;
   defaultView: string = VIEW_MAIN;
   defaultPanel: string = PANEL_MAIN;
-  noSlash: boolean = false;
+  alwaysStartWithSlash: boolean = true;
   private stated: boolean = false;
 
   constructor(routes: RouteList, routerConfig: RouterConfig | null = null) {
@@ -59,7 +59,7 @@ export class Router extends EventEmitter<{
         this.defaultPanel = routerConfig.defaultPanel;
       }
       if (routerConfig.noSlash !== undefined) {
-        this.noSlash = routerConfig.noSlash;
+        this.alwaysStartWithSlash = routerConfig.noSlash;
       }
     }
   }
@@ -82,7 +82,8 @@ export class Router extends EventEmitter<{
       this.emit("enter", nextRoute, this.history.getCurrentRoute());
       state.history = [nextRoute.getPanelId()]
     }
-    // при старте роутера у nextRoute не должен вызываться колбек onLeave
+    // при старте роутера у currentRoute не должен вызываться колбек onLeave
+    // потому что небыло перехода с экрана
     const currentRoute = nextRoute.clone()
     currentRoute.structure.leaveCallback = null
     this.history.init(currentRoute, state);
@@ -172,14 +173,23 @@ export class Router extends EventEmitter<{
     this.replace(s, nextRoute);
   }
 
+  pushPageAfterPreviews(prevPageId: string, pageId: string, params: PageParams = {}) {
+    const offset = this.getPageOffset(prevPageId) - 1;
+    if (this.history.canJumpIntoOffset(offset)) {
+      return this.popPageToAndPush(offset, pageId, params);
+    } else {
+      return this.popPageToAndPush(0, pageId, params);
+    }
+  }
+
   popPage() {
     this.log("popPage");
-    this.back();
+    Router.back();
   }
 
   popPageTo(x: number) {
     this.log("popPageTo", x);
-    this.backTo(x);
+    Router.backTo(x);
   }
 
   popPageToAndPush(x: number, pageId: string, params: PageParams = {}) {
@@ -187,7 +197,7 @@ export class Router extends EventEmitter<{
       this.deferOnGoBack = () => {
         this.pushPage(pageId, params)
       };
-      this.backTo(x);
+      Router.backTo(x);
     } else {
       this.pushPage(pageId, params);
     }
@@ -270,7 +280,7 @@ export class Router extends EventEmitter<{
     let currentRoute = this.getCurrentRouteOrDef();
     if (currentRoute.isModal()) {
       this.log("popPageIfModal");
-      this.back();
+      Router.back();
     }
   }
 
@@ -278,7 +288,7 @@ export class Router extends EventEmitter<{
     let currentRoute = this.getCurrentRouteOrDef();
     if (currentRoute.isPopup()) {
       this.log("popPageIfPopup");
-      this.back();
+      Router.back();
     }
   }
 
@@ -293,7 +303,7 @@ export class Router extends EventEmitter<{
 
   createRouteFromLocation(location: string): MyRoute {
     try {
-      return MyRoute.fromLocation(this.routes, location, this.noSlash)
+      return MyRoute.fromLocation(this.routes, location, this.alwaysStartWithSlash)
     } catch (e) {
       if (e && e.message === 'ROUTE_NOT_FOUND') {
         return this.getDefaultRoute(location, MyRoute.getParamsFromPath(location))
@@ -306,7 +316,7 @@ export class Router extends EventEmitter<{
     let currentRoute = this.getCurrentRouteOrDef();
     if (currentRoute.isPopup() || currentRoute.isModal()) {
       this.log("popPageIfModalOrPopup");
-      this.back();
+      Router.back();
     }
   }
 
@@ -359,22 +369,90 @@ export class Router extends EventEmitter<{
     preventBlinkingBySettingScrollRestoration();
   }
 
-  private back() {
+  private static back() {
     window.history.back();
   }
 
-  private backTo(x: number) {
+  private static backTo(x: number) {
     window.history.go(x);
   }
 
   private createRouteFromLocationWithReplace() {
-    let nextRoute = this.createRouteFromLocation(window.location.hash);
-    if (nextRoute.isBadRoute) {
-      nextRoute = this.replacerUnknownRoute(nextRoute, this.history.getCurrentRoute());
+    const location = window.location.hash
+    try {
+      return MyRoute.fromLocation(this.routes, location, this.alwaysStartWithSlash)
+    } catch (e) {
+      if (e && e.message === 'ROUTE_NOT_FOUND') {
+        const def = this.getDefaultRoute(location, MyRoute.getParamsFromPath(location))
+        return this.replacerUnknownRoute(def, this.history.getCurrentRoute())
+      }
+      throw e
     }
-    if (nextRoute.isBadRoute) {
-      this.emit("unknown", nextRoute, this.history.getCurrentRoute());
-    }
-    return nextRoute
   }
+
+  public getLastPanelInView(viewId: string): string | undefined {
+    return this.lastPanelInView[viewId]
+  }
+
+  public getViewHistory(viewId: string): string[] {
+    const route = this.getRoute()
+    const state = this.getCurrentStateOrDef();
+    if (route.getViewId() === viewId) {
+      return state.history
+    } else {
+      const lastPanelId = this.getPanelIdInView(viewId)
+      if (lastPanelId) {
+        return [lastPanelId]
+      }
+      return []
+    }
+  }
+
+  public getViewHistoryWithLastPanel(viewId: string): string[] {
+    const history = this.getViewHistory(viewId);
+    const lastPanel = this.getLastPanelInView(viewId);
+    if (lastPanel && history.indexOf(lastPanel) === -1) {
+      return history.concat([lastPanel])
+    } else {
+      return history
+    }
+  }
+
+  public getPanelIdInView(viewId: string): string | undefined {
+    const route = this.getRoute()
+    if (route.getViewId() === viewId) {
+      return route.getPanelId()
+    } else {
+      return this.getLastPanelInView(viewId)
+    }
+  }
+
+  public getRoute(): MyRoute {
+    return this.getCurrentRouteOrDef()
+  }
+
+  public getPanelId() {
+    return this.getRoute().getPanelId()
+  }
+
+  public getViewId() {
+    return this.getRoute().getViewId()
+  }
+
+  public getModalId() {
+    return this.getRoute().getModalId()
+  }
+
+  public getPopupId() {
+    return this.getRoute().getPopupId()
+  }
+
+  public getParams():PageParams {
+    return this.getRoute().getParams()
+  }
+
+  public hasOverlay() {
+    return this.getRoute().hasOverlay()
+  }
+
 }

@@ -1,8 +1,24 @@
-import {useContext} from "react";
-import {RouterContext} from "../entities/RouterContext";
+import {useEffect, useState} from "react";
+import {Route} from "../..";
+import {useRouter} from "./useRouter";
 
-export function useRoute() {
-  const router = useContext(RouterContext);
-  if (!router) throw new Error("Use useRoute without context");
-  return router.getCurrentRouteOrDef();
+/**
+ * @param withUpdate
+ * @deprecated useRouter
+ */
+export function useRoute(withUpdate: boolean = true): Route {
+  const router = useRouter(false)
+  const [route, setRoute] = useState(router.getCurrentRouteOrDef())
+  useEffect(() => {
+    const fn = (next: Route) => {
+      if (withUpdate) {
+        setRoute(next);
+      }
+    };
+    router.on("update", fn);
+    return () => {
+      router.off("update", fn);
+    }
+  }, []);
+  return route;
 }

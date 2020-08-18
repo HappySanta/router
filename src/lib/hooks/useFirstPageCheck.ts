@@ -1,8 +1,6 @@
-import {useContext} from "react";
-import {RouterContext} from "../entities/RouterContext";
+import {useRouter} from "./useRouter";
 
-export function useFirstPageCheck(): boolean {
-  const router = useContext(RouterContext);
-  if (!router) throw new Error("Use useFirstPageCheck without context");
+export function useFirstPageCheck(withUpdate: boolean = false): boolean {
+  const router = useRouter(withUpdate);
   return router.isFirstPage();
 }

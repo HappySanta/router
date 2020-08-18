@@ -1,4 +1,4 @@
-import {generatePath, MatchInterface, matchPath} from "../tools"
+import {generatePath, MatchInterface, matchPath} from "../workWithPathRegexp"
 import * as qs from "querystring"
 import {Page} from "./Page";
 import {PageParams, RouteList} from "./Router";
@@ -20,7 +20,6 @@ export class Route {
   location: string;
   pageId: string;
   params: PageParams = {};
-  isBadRoute: boolean = false;
   uniqId: number;
 
 
@@ -43,13 +42,16 @@ export class Route {
    * @param location "info?w=about&show=1" то, что лежит в window.location.hash
    * @param noSlash
    */
-  static fromLocation(routeList: RouteList, location: string, noSlash: boolean) {
+  static fromLocation(routeList: RouteList, location: string, noSlash: boolean = true) {
     const params = Route.getParamsFromPath(location);
     location = location.replace("#", '');
     if (noSlash && location.length && location[0] !== '/') {
       location = '/' + location
     }
-    location = location.split("?", 2).shift() || "";
+    if (noSlash && !location.length) {
+      location = '/' + location
+    }
+    location = location.split("?", 2).shift() || (noSlash ? "/" : "");
 
     let match: null | MatchInterface = null;
     for (let pageId in routeList) {
@@ -82,7 +84,7 @@ export class Route {
 
   clone(): Route {
     const copy = new Route(this.structure.clone(), this.location, this.pageId, {...this.params});
-    copy.isBadRoute = this.isBadRoute;
+    copy.uniqId = this.uniqId;
     return copy;
   }
 
@@ -113,7 +115,7 @@ export class Route {
     return this.structure.rootId
   }
 
-  getParams() {
+  getParams():PageParams {
     return this.params
   }
 
@@ -126,8 +128,8 @@ export class Route {
     return !!this.getPopupId()
   }
 
-  getPopupId(): string | number | null {
-    return this.params[POPUP_KEY] || null
+  getPopupId(): string | null {
+    return (this.params[POPUP_KEY]?.toString()) || null
   }
 
   setPopupId(popupId: string): Route {

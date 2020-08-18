@@ -3,7 +3,7 @@
  */
 import {
   dangerousResetGlobalRouterUseForTestOnly,
-  getCurrentRoute,
+  getCurrentRoute, getCurrentRouteOrDef,
   popPage,
   pushPage,
   startGlobalRouter
@@ -50,12 +50,12 @@ test('route basic with enter leave callback', (done) => {
     [USER_PAGE]: new Page(USER_PANEL).onEnter(() => userEnterCalls++).onLeave(() => userLeaveCalls++),
   } as RouteList);
 
-  const r = getCurrentRoute();
+  const r = getCurrentRouteOrDef();
   expect(r.getPageId()).toBe(MAIN_PAGE)
   expect(r.getPanelId()).toBe(MAIN_PANEL)
 
   pushPage(USER_PAGE, {id: "15"})
-  const r1 = getCurrentRoute();
+  const r1 = getCurrentRouteOrDef();
   expect(r1.getPageId()).toBe(USER_PAGE);
   expect(r1.getPanelId()).toBe(USER_PANEL);
   expect(r1.getParams()).toHaveProperty("id", "15")
@@ -68,5 +68,5 @@ test('route basic with enter leave callback', (done) => {
     expect(userEnterCalls).toBe(1)
     expect(userLeaveCalls).toBe(1)
     done()
-  }, 10)
+  }, 150)
 });

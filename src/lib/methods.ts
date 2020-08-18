@@ -65,52 +65,45 @@ export function popPageIfModalOrPopup() {
 }
 
 export function pushPageAfterPreviews(prevPageId: string, pageId: string, params: PageParams = {}) {
-  const offset = getGlobalRouter().getPageOffset(prevPageId) - 1;
-  if (getGlobalRouter().history.canJumpIntoOffset(offset)) {
-    return getGlobalRouter().popPageToAndPush(offset, pageId, params);
-  } else {
-    return getGlobalRouter().popPageToAndPush(0, pageId, params);
-  }
+  return getGlobalRouter().pushPageAfterPreviews(prevPageId, pageId, params)
 }
 
-
-export function getLastPanelInView(viewId: string) {
-  return getGlobalRouter().lastPanelInView[viewId]
+export function getLastPanelInView(viewId: string):string|undefined {
+  return getGlobalRouter().getLastPanelInView(viewId)
 }
 
+/**
+ * @deprecated getCurrentStateOrDef
+ */
 export function getCurrentRouterState() {
+  return getCurrentStateOrDef();
+}
+
+export function getCurrentStateOrDef() {
   return getGlobalRouter().getCurrentStateOrDef();
 }
 
+/**
+ * @deprecated getCurrentRouteOrDef
+ */
 export function getCurrentRoute(): Route {
+  return getCurrentRouteOrDef();
+}
+
+export function getCurrentRouteOrDef() {
   return getGlobalRouter().getCurrentRouteOrDef();
 }
 
-export function getViewHistory(route: Route, viewId: string): string[] {
-  const state = getCurrentRouterState();
-  if (route.getViewId() === viewId) {
-    return state.history
-  } else {
-    return [getPanelIdInView(route, viewId)].filter(x => !!x)
-  }
+export function getViewHistory(viewId: string): string[] {
+  return getGlobalRouter().getViewHistory(viewId)
 }
 
-export function getViewHistoryWithLastPanel(route: Route, viewId: string): string[] {
-  const history = getViewHistory(route, viewId);
-  const lastPanel = getLastPanelInView(viewId);
-  if (history.indexOf(lastPanel) === -1) {
-    return history.concat([lastPanel])
-  } else {
-    return history
-  }
+export function getViewHistoryWithLastPanel(viewId: string): string[] {
+  return getGlobalRouter().getViewHistoryWithLastPanel(viewId)
 }
 
-export function getPanelIdInView(route: Route, viewId: string): string {
-  if (route.getViewId() === viewId) {
-    return route.getPanelId()
-  } else {
-    return getLastPanelInView(viewId)
-  }
+export function getPanelIdInView(viewId: string): string|undefined {
+  return getGlobalRouter().getPanelIdInView(viewId)
 }
 
 export function isInfinityPanel(panelId: string): boolean {
