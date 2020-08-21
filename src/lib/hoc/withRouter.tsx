@@ -29,12 +29,26 @@ export interface SantaRouterProps extends RouterProps {
 
 /**
  * @deprecated use withRouter
+ * @ignore
  */
 export function withSantaRouter<T>(Component: ComponentType<RouterProps & T>): ComponentType<T> {
   return withRouter<T>(Component)
 }
 
-
+/**
+ * HOC для добавления свойств
+ *
+ * location:{@link Location}
+ * router:{@link Router}
+ *
+ * в переданный компонент
+ *
+ * ```typescript
+ * export default withRouter(App);
+ * ```
+ * @param Component
+ * @param withUpdate true - обновлять изменении при изменении location false - не обновлять
+ */
 export function withRouter<T>(Component: ComponentType<RouterProps & T>, withUpdate: boolean = true): ComponentType<T> {
   function WithRouter(props: T) {
     const router = useRouter(withUpdate)
@@ -48,6 +62,15 @@ export function withRouter<T>(Component: ComponentType<RouterProps & T>, withUpd
   return WithRouter;
 }
 
+/**
+ * HOC для добавления
+ * params:{@link PageParams}
+ * в компонент
+ *
+ * параметры не обновляются при переходах по страницам
+ *
+ * @param Component
+ */
 export function withParams<T>(Component: ComponentType<RouterParams & T>): ComponentType<T> {
   function WithParams(props: T) {
     const params = useParams()

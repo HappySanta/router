@@ -6,6 +6,11 @@ import {PageParams} from "./entities/Types";
 
 let globalRouter: Router | null = null;
 
+/**
+ * @ignore
+ * @param routes
+ * @param config
+ */
 export function startGlobalRouter(routes: RouteList, config: RouterConfig | null = null): Router {
   if (globalRouter) {
     throw new Error('startGlobalRouter called twice is not allowed')
@@ -26,6 +31,9 @@ export function setGlobalRouter(router: Router) {
   globalRouter = router
 }
 
+/**
+ * @ignore
+ */
 export function dangerousResetGlobalRouterUseForTestOnly() {
   if (globalRouter) {
     globalRouter.stop()
@@ -83,6 +91,7 @@ export function pushPageAfterPreviews(prevPageId: string, pageId: string, params
 
 /**
  * @deprecated getCurrentStateOrDef
+ * @ignore
  */
 export function getCurrentRouterState() {
   return getCurrentStateOrDef();
@@ -94,6 +103,7 @@ export function getCurrentStateOrDef() {
 
 /**
  * @deprecated getCurrentRouteOrDef
+ * @ignore
  */
 export function getCurrentRoute(): Route {
   return getCurrentRouteOrDef();

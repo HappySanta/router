@@ -8,32 +8,6 @@ https://vk.com/@-197036977-navigaciya-mini-apps-vkui
 пример приложения с роутером
 https://github.com/HappySanta/router-example/tree/master/src
 
-## Changelog
-
-**0.0.7**
-
-Добавлено новое поле в событие ```update``` ```isNewRoute:boolean```.
-
-`true` - когда событие вызвано после методов `push*` `replace*`
-
-`false`- когда событие вызвано переходом по истории назад или вперед
-
-Это поле нужно использовать когда в событии `update` находится логика загрузки данных для предотвращения повторной загрузки когда осуществляется переход назад.
-
-```ts
-getGlobalRouter().on("update", (next:Route, old:Route|undefined, isNewRoute:boolean) => {
-    if (isNewRoute) {
-	  // Переход на новый экран после методов pushPage replacePage  
-    } else {
-	  // Переход назад popPage или бразурные кнопки
-    }
-    console.log("new route id", next)
-    if (old) {
-        console.log("old route was", old)
-    }
-})
-``` 
-
 ## Как использовать
 
 ### Install
@@ -179,3 +153,18 @@ popPage()
 await delay(10)
 replacePage("/info")
  ```
+
+
+# Локальная разработка
+
+
+удаляет react react-dom который конфилкнуют если вы линкуете через `npm link` `yarn link` либу в другой проект
+```
+yarn run fix-for-link
+```
+
+
+Публикация
+```bash
+yarn run pub
+```

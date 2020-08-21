@@ -1,3 +1,12 @@
+/**
+ * @ignore
+ * @packageDocumentation
+ */
+
+
+/**
+ * @ignore
+ */
 export interface State {
   i: string,
   history: string[],
@@ -11,11 +20,18 @@ export interface State {
 
 let randomIdForCheckState = (Math.random() * 2000000) + "." + Date.now();
 
+/**
+ * Используется для тестов где не сбрасывается состояние jsdom
+ * @ignore
+ */
 export function __testResetHistoryUniqueId() {
   randomIdForCheckState = (Math.random() * 2000000) + "." + Date.now();
 }
 
-
+/**
+ * @ignore
+ * @param currentIndex
+ */
 export function stateFromLocation(currentIndex: number): State {
   const state = window.history.state;
   if (state && typeof state == "object") {

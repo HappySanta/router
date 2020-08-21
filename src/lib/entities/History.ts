@@ -1,15 +1,34 @@
+/**
+ * @ignore
+ * @packageDocumentation
+ */
+
+
 import {Route} from "./Route";
 import {State} from "./State";
 import {HistoryUpdateType} from "./Types";
 
-
+/**
+ * @ignore
+ */
 export const HISTORY_UPDATE_PUSH: HistoryUpdateType = "PUSH";
+/**
+ * @ignore
+ */
 export const HISTORY_UPDATE_REPLACE: HistoryUpdateType = "REPLACE";
+/**
+ * @ignore
+ */
 export const HISTORY_UPDATE_MOVE: HistoryUpdateType = "MOVE";
 
+/**
+ * @ignore
+ */
 export type UpdateEventType = [Route, Route | undefined, boolean, HistoryUpdateType];
 
-
+/**
+ * @ignore
+ */
 export class History {
 
   private stack: [Route, State][] = [];

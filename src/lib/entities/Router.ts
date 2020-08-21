@@ -11,9 +11,19 @@ import {Location} from "./Location";
 import {HistoryUpdateType, PageParams} from "./Types";
 
 export declare type RouteList = { [key: string]: Page }
+
 export declare type ReplaceUnknownRouteFn = (newRoute: MyRoute, oldRoute?: MyRoute) => MyRoute
+/**
+ * @ignore
+ */
 export declare type UpdateEventFn = (newRoute: MyRoute, oldRoute: MyRoute | undefined, isNewRoute: boolean, type: HistoryUpdateType) => void
+/**
+ * @ignore
+ */
 export declare type EnterEventFn = (newRoute: MyRoute, oldRoute?: MyRoute) => void
+/**
+ * @ignore
+ */
 export declare type LeaveEventFn = (newRoute: MyRoute, oldRoute: MyRoute, isNewRoute: boolean, type: HistoryUpdateType) => void
 
 export class Router extends EventEmitter<{
@@ -32,6 +42,24 @@ export class Router extends EventEmitter<{
   private startHistoryOffset: number = 0;
   private started: boolean = false;
 
+  /**
+   *
+   * ```javascript
+   * export const PAGE_MAIN = '/';
+   * export const PAGE_PERSIK = '/persik';
+   * export const PANEL_MAIN = 'panel_main';
+   * export const PANEL_PERSIK = 'panel_persik';
+   * export const VIEW_MAIN = 'view_main';
+   * const routes = {
+   *   [PAGE_MAIN]: new Page(PANEL_MAIN, VIEW_MAIN),
+   *   [PAGE_PERSIK]: new Page(PANEL_PERSIK, VIEW_MAIN),
+   * };
+   * export const router = new Router(routes);
+   * router.start();
+   * ```
+   * @param routes
+   * @param routerConfig
+   */
   constructor(routes: RouteList, routerConfig: RouterConfig | null = null) {
     super();
     this.routes = routes;
@@ -118,6 +146,11 @@ export class Router extends EventEmitter<{
     console.log.apply(this, args)
   }
 
+  /**
+   * Добавляет новую страницу в историю
+   * @param pageId страница указанная в конструкторе {@link Router.constructor}
+   * @param params можно получить из {@link Location.getParams}
+   */
   pushPage(pageId: string, params: PageParams = {}) {
     this.log("pushPage " + pageId, params);
     this.checkParams(params);
@@ -132,6 +165,11 @@ export class Router extends EventEmitter<{
     this.push(s, nextRoute);
   }
 
+  /**
+   * Заменяет текущую страницу на переданную
+   * @param pageId страница указанная в конструкторе {@link Router.constructor}
+   * @param params можно получить из {@link Location.getParams}
+   */
   replacePage(pageId: string, params: PageParams = {}) {
     this.log("replacePage " + pageId, params);
     let currentRoute = this.getCurrentRouteOrDef();
@@ -421,5 +459,15 @@ export class Router extends EventEmitter<{
       }
       throw e
     }
+  }
+
+  afterUpdate() {
+    return new Promise( (resolve) => {
+      const fn = () => {
+        resolve()
+        this.off("update", fn)
+      }
+      this.on("update", fn)
+    } )
   }
 }
