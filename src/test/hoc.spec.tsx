@@ -7,9 +7,9 @@ afterEach(cleanup);
 class MainBlank extends React.Component<RouterProps> {
 
   render() {
-    const {router} = this.props
-    const first = router.isFirstPage()
-    return <span>{"Hello world: " + router.getPanelId() + " " + (first ? "first_page" : "")}</span>
+    const {location} = this.props
+    const first = location.isFirstPage()
+    return <span>{"Hello world: " + location.getPanelId() + " " + (first ? "first_page" : "")}</span>
   }
 }
 

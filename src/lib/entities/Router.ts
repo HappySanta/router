@@ -7,12 +7,11 @@ import {EventEmitter} from "tsee";
 
 import {PAGE_MAIN, PANEL_MAIN, VIEW_MAIN} from "../const";
 import {RouterConfig} from "./RouterConfig";
+import {Location} from "./Location";
+import {HistoryUpdateType, PageParams} from "./Types";
 
 export declare type RouteList = { [key: string]: Page }
 export declare type ReplaceUnknownRouteFn = (newRoute: MyRoute, oldRoute?: MyRoute) => MyRoute
-export declare type PageParams = { [key: string]: string | number }
-
-export declare type HistoryUpdateType = "PUSH" | "REPLACE" | "MOVE";
 export declare type UpdateEventFn = (newRoute: MyRoute, oldRoute: MyRoute | undefined, isNewRoute: boolean, type: HistoryUpdateType) => void
 export declare type EnterEventFn = (newRoute: MyRoute, oldRoute?: MyRoute) => void
 export declare type LeaveEventFn = (newRoute: MyRoute, oldRoute: MyRoute, isNewRoute: boolean, type: HistoryUpdateType) => void
@@ -21,19 +20,17 @@ export class Router extends EventEmitter<{
   update: UpdateEventFn,
   enter: EnterEventFn,
 }> {
-
   routes: RouteList = {};
   history: History;
-  deferOnGoBack: (() => void) | null = null;
-  startHistoryOffset: number = 0;
-  lastPanelInView: { [key: string]: string } = {};
   enableLogging: boolean = false;
   enableErrorThrowing: boolean = false;
   defaultPage: string = PAGE_MAIN;
   defaultView: string = VIEW_MAIN;
   defaultPanel: string = PANEL_MAIN;
   alwaysStartWithSlash: boolean = true;
-  private stated: boolean = false;
+  private deferOnGoBack: (() => void) | null = null;
+  private startHistoryOffset: number = 0;
+  private started: boolean = false;
 
   constructor(routes: RouteList, routerConfig: RouterConfig | null = null) {
     super();
@@ -72,13 +69,11 @@ export class Router extends EventEmitter<{
   replacerUnknownRoute: ReplaceUnknownRouteFn = r => r;
 
   start() {
-    if (this.stated) {
+    if (this.started) {
       throw new Error("start method call twice! this is not allowed");
     }
-    this.stated = true;
+    this.started = true;
 
-    this.off("update", this.saveLastPanelInView);
-    this.on("update", this.saveLastPanelInView);
     this.startHistoryOffset = window.history.length;
     let nextRoute = this.createRouteFromLocationWithReplace();
     const state = stateFromLocation(this.history.getCurrentIndex());
@@ -112,19 +107,6 @@ export class Router extends EventEmitter<{
     return stateFromLocation(this.history.getCurrentIndex());
   }
 
-  checkParams(params: PageParams) {
-    if (params.hasOwnProperty(POPUP_KEY)) {
-      if (this.isErrorThrowingEnabled()) {
-        throw new Error(`pushPage with key [${POPUP_KEY}]:${params[POPUP_KEY]} is not allowed use another key`)
-      }
-    }
-    if (params.hasOwnProperty(MODAL_KEY)) {
-      if (this.isErrorThrowingEnabled()) {
-        throw new Error(`pushPage with key [${MODAL_KEY}]:${params[MODAL_KEY]} is not allowed use another key`)
-      }
-    }
-  }
-
   isErrorThrowingEnabled() {
     return this.enableErrorThrowing;
   }
@@ -134,14 +116,6 @@ export class Router extends EventEmitter<{
       return
     }
     console.log.apply(this, args)
-  }
-
-  /**
-   * Если вам надо отрисовать стрелочку назад или домик то используйте эту функцию
-   */
-  isFirstPage(): boolean {
-    const state = this.getCurrentStateOrDef();
-    return state.first === 1;
   }
 
   pushPage(pageId: string, params: PageParams = {}) {
@@ -292,25 +266,9 @@ export class Router extends EventEmitter<{
     }
   }
 
-  getDefaultRoute(location: string, params: PageParams) {
-    return new MyRoute(
-      new Page(this.defaultPanel, this.defaultView),
-      this.defaultPage,
-      params,
-    );
-  }
-
-  createRouteFromLocation(location: string): MyRoute {
-    try {
-      return MyRoute.fromLocation(this.routes, location, this.alwaysStartWithSlash)
-    } catch (e) {
-      if (e && e.message === 'ROUTE_NOT_FOUND') {
-        return this.getDefaultRoute(location, MyRoute.getParamsFromPath(location))
-      }
-      throw e
-    }
-  }
-
+  /**
+   * @deprecated use popPageIfHasOverlay
+   */
   popPageIfModalOrPopup() {
     let currentRoute = this.getCurrentRouteOrDef();
     if (currentRoute.isPopup() || currentRoute.isModal()) {
@@ -319,77 +277,85 @@ export class Router extends EventEmitter<{
     }
   }
 
-  public getLastPanelInView(viewId: string): string | undefined {
-    return this.lastPanelInView[viewId]
+  popPageIfHasOverlay() {
+    let currentRoute = this.getCurrentRouteOrDef();
+    if (currentRoute.hasOverlay()) {
+      this.log("popPageIfHasOverlay");
+      Router.back();
+    }
   }
 
-  public getViewHistory(viewId: string): string[] {
-    const route = this.getRoute()
-    const state = this.getCurrentStateOrDef();
-    if (route.getViewId() === viewId) {
-      return state.history
-    } else {
-      const lastPanelId = this.getPanelIdInView(viewId)
-      if (lastPanelId) {
-        return [lastPanelId]
+  /**
+   * @param pageId
+   * @param fn
+   * @return unsubscribe function
+   */
+  onEnterPage(pageId: string, fn: UpdateEventFn): () => void {
+    const _fn = (newRoute: MyRoute, oldRoute: MyRoute | undefined, isNewRoute: boolean, type: HistoryUpdateType) => {
+      if (newRoute.pageId === pageId) {
+        if (!newRoute.hasOverlay()) {
+          fn(newRoute, oldRoute, isNewRoute, type)
+        }
       }
-      return []
+    }
+
+    this.on("update", _fn)
+    return () => {
+      this.off("update", _fn)
     }
   }
 
-  public getViewHistoryWithLastPanel(viewId: string): string[] {
-    const history = this.getViewHistory(viewId);
-    const lastPanel = this.getLastPanelInView(viewId);
-    if (lastPanel && history.indexOf(lastPanel) === -1) {
-      return history.concat([lastPanel])
-    } else {
-      return history
+  /**
+   * @param pageId
+   * @param fn
+   * @return unsubscribe function
+   */
+  onLeavePage(pageId: string, fn: LeaveEventFn): () => void {
+    const _fn = (newRoute: MyRoute, oldRoute: MyRoute | undefined, isNewRoute: boolean, type: HistoryUpdateType) => {
+      if (oldRoute && oldRoute.pageId === pageId) {
+        if (!oldRoute.hasOverlay()) {
+          fn(newRoute, oldRoute, isNewRoute, type)
+        }
+      }
+    }
+
+    this.on("update", _fn)
+    return () => {
+      this.off("update", _fn)
     }
   }
 
-  public getPanelIdInView(viewId: string): string | undefined {
-    const route = this.getRoute()
-    if (route.getViewId() === viewId) {
-      return route.getPanelId()
-    } else {
-      return this.getLastPanelInView(viewId)
+  getCurrentLocation(): Location {
+    return new Location(this.getCurrentRouteOrDef(), this.getCurrentStateOrDef())
+  }
+
+  private checkParams(params: PageParams) {
+    if (params.hasOwnProperty(POPUP_KEY)) {
+      if (this.isErrorThrowingEnabled()) {
+        throw new Error(`pushPage with key [${POPUP_KEY}]:${params[POPUP_KEY]} is not allowed use another key`)
+      }
+    }
+    if (params.hasOwnProperty(MODAL_KEY)) {
+      if (this.isErrorThrowingEnabled()) {
+        throw new Error(`pushPage with key [${MODAL_KEY}]:${params[MODAL_KEY]} is not allowed use another key`)
+      }
     }
   }
 
-  public getRoute(): MyRoute {
-    return this.getCurrentRouteOrDef()
-  }
-
-  public getPanelId() {
-    return this.getRoute().getPanelId()
-  }
-
-  public getViewId() {
-    return this.getRoute().getViewId()
-  }
-
-  public getModalId() {
-    return this.getRoute().getModalId()
-  }
-
-  public getPopupId() {
-    return this.getRoute().getPopupId()
-  }
-
-  public getParams(): PageParams {
-    return this.getRoute().getParams()
-  }
-
-  public hasOverlay() {
-    return this.getRoute().hasOverlay()
-  }
-
-  private saveLastPanelInView = (next: MyRoute, prev?: MyRoute) => {
-    this.lastPanelInView[next.getViewId()] = next.getPanelId();
-    if (prev) {
-      this.lastPanelInView[prev.getViewId()] = prev.getPanelId();
+  private getDefaultRoute(location: string, params: PageParams) {
+    try {
+      return MyRoute.fromLocation(this.routes, "/", this.alwaysStartWithSlash)
+    } catch (e) {
+      if (e && e.message === 'ROUTE_NOT_FOUND') {
+        return new MyRoute(
+          new Page(this.defaultPanel, this.defaultView),
+          this.defaultPage,
+          params,
+        );
+      }
+      throw e
     }
-  };
+  }
 
   private onPopState = () => {
     if (this.deferOnGoBack) {
@@ -446,44 +412,14 @@ export class Router extends EventEmitter<{
     }
   }
 
-
-  /**
-   * @param pageId
-   * @param fn
-   * @return unsubscribe function
-   */
-  onEnterPage(pageId:string, fn:UpdateEventFn):() => void {
-    const _fn = (newRoute: MyRoute, oldRoute: MyRoute | undefined, isNewRoute: boolean, type: HistoryUpdateType) => {
-      if (newRoute.pageId === pageId) {
-        if (!newRoute.hasOverlay()) {
-          fn(newRoute, oldRoute, isNewRoute, type)
-        }
+  private createRouteFromLocation(location: string): MyRoute {
+    try {
+      return MyRoute.fromLocation(this.routes, location, this.alwaysStartWithSlash)
+    } catch (e) {
+      if (e && e.message === 'ROUTE_NOT_FOUND') {
+        return this.getDefaultRoute(location, MyRoute.getParamsFromPath(location))
       }
-    }
-
-    this.on("update", _fn)
-    return () => {
-      this.off("update", _fn)
-    }
-  }
-
-  /**
-   * @param pageId
-   * @param fn
-   * @return unsubscribe function
-   */
-  onLeavePage(pageId:string, fn:LeaveEventFn):() => void {
-    const _fn = (newRoute: MyRoute, oldRoute: MyRoute | undefined, isNewRoute: boolean, type: HistoryUpdateType) => {
-      if (oldRoute && oldRoute.pageId === pageId) {
-        if (!oldRoute.hasOverlay()) {
-          fn(newRoute, oldRoute, isNewRoute, type)
-        }
-      }
-    }
-
-    this.on("update", _fn)
-    return () => {
-      this.off("update", _fn)
+      throw e
     }
   }
 }

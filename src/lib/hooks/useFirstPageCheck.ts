@@ -1,6 +1,6 @@
-import {useRouter} from "./useRouter";
+import {useLocation} from "./useRouter";
 
 export function useFirstPageCheck(withUpdate: boolean = false): boolean {
-  const router = useRouter(withUpdate);
-  return router.isFirstPage();
+  const location = useLocation(withUpdate);
+  return location.isFirstPage();
 }

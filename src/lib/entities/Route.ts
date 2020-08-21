@@ -1,7 +1,8 @@
 import {generatePath, MatchInterface, matchPath} from "../workWithPathRegexp"
 import * as qs from "querystring"
 import {Page} from "./Page";
-import {PageParams, RouteList} from "./Router";
+import {RouteList} from "./Router";
+import {PageParams} from "./Types";
 
 export const POPUP_KEY = 'p';
 export const MODAL_KEY = 'm';

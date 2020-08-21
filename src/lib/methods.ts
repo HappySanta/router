@@ -1,6 +1,8 @@
-import {PageParams, RouteList, Router} from "./entities/Router";
+import {RouteList, Router} from "./entities/Router";
 import {Route} from "./entities/Route";
 import {RouterConfig} from "./entities/RouterConfig";
+import {__testResetHistoryUniqueId} from "./entities/State";
+import {PageParams} from "./entities/Types";
 
 let globalRouter: Router | null = null;
 
@@ -29,6 +31,10 @@ export function dangerousResetGlobalRouterUseForTestOnly() {
     globalRouter.stop()
     window.history.pushState(null, "", "")
   }
+  if (window.history.state) {
+    window.history.pushState(null, "", "")
+  }
+  __testResetHistoryUniqueId()
   globalRouter = null
 }
 
@@ -60,16 +66,19 @@ export function replacePopout(popupId: string, params: PageParams = {}) {
   return getGlobalRouter().replacePopup(popupId, params)
 }
 
+/**
+ * @deprecated use popPageIfHasOverlay
+ */
 export function popPageIfModalOrPopup() {
   return getGlobalRouter().popPageIfModalOrPopup()
 }
 
-export function pushPageAfterPreviews(prevPageId: string, pageId: string, params: PageParams = {}) {
-  return getGlobalRouter().pushPageAfterPreviews(prevPageId, pageId, params)
+export function popPageIfHasOverlay() {
+  return getGlobalRouter().popPageIfHasOverlay()
 }
 
-export function getLastPanelInView(viewId: string): string | undefined {
-  return getGlobalRouter().getLastPanelInView(viewId)
+export function pushPageAfterPreviews(prevPageId: string, pageId: string, params: PageParams = {}) {
+  return getGlobalRouter().pushPageAfterPreviews(prevPageId, pageId, params)
 }
 
 /**
@@ -92,18 +101,6 @@ export function getCurrentRoute(): Route {
 
 export function getCurrentRouteOrDef() {
   return getGlobalRouter().getCurrentRouteOrDef();
-}
-
-export function getViewHistory(viewId: string): string[] {
-  return getGlobalRouter().getViewHistory(viewId)
-}
-
-export function getViewHistoryWithLastPanel(viewId: string): string[] {
-  return getGlobalRouter().getViewHistoryWithLastPanel(viewId)
-}
-
-export function getPanelIdInView(viewId: string): string | undefined {
-  return getGlobalRouter().getPanelIdInView(viewId)
 }
 
 export function isInfinityPanel(panelId: string): boolean {

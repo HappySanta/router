@@ -1,7 +1,5 @@
 import React, {ComponentType} from "react";
-import {Route, Router} from "../..";
-import {State} from "../entities/State";
-import {useRouter} from "../hooks/useRouter";
+import {Location, PageParams, Route, Router, State, useParams, useRouter} from "../..";
 
 export interface RouterProps {
   /**
@@ -15,6 +13,11 @@ export interface RouterProps {
   route: Route,
 
   router: Router,
+  location: Location,
+}
+
+export interface RouterParams {
+  params: PageParams,
 }
 
 /**
@@ -35,8 +38,21 @@ export function withSantaRouter<T>(Component: ComponentType<RouterProps & T>): C
 export function withRouter<T>(Component: ComponentType<RouterProps & T>, withUpdate: boolean = true): ComponentType<T> {
   function WithRouter(props: T) {
     const router = useRouter(withUpdate)
-    return <Component {...props} router={router} routeState={router.getCurrentStateOrDef()} route={router.getCurrentRouteOrDef()}/>;
+    return <Component {...props}
+                      router={router}
+                      location={router.getCurrentLocation()}
+                      routeState={router.getCurrentStateOrDef()}
+                      route={router.getCurrentRouteOrDef()}/>;
   }
 
   return WithRouter;
+}
+
+export function withParams<T>(Component: ComponentType<RouterParams & T>): ComponentType<T> {
+  function WithParams(props: T) {
+    const params = useParams()
+    return <Component {...props} params={params}/>;
+  }
+
+  return WithParams;
 }

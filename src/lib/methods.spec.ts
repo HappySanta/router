@@ -3,8 +3,11 @@
  */
 import {
   dangerousResetGlobalRouterUseForTestOnly,
-  getCurrentRoute, getGlobalRouter, popPage,
-  pushPage, setGlobalRouter,
+  getCurrentRoute,
+  getGlobalRouter,
+  popPage,
+  pushPage,
+  setGlobalRouter,
   startGlobalRouter
 } from "./methods";
 import {Page} from "./entities/Page";
@@ -66,12 +69,12 @@ test('route basic with enter leave callback', (done) => {
   router.start()
   setGlobalRouter(router)
 
-  const r = getGlobalRouter().getRoute();
+  const r = getGlobalRouter().getCurrentLocation().route;
   expect(r.getPageId()).toBe(MAIN_PAGE)
   expect(r.getPanelId()).toBe(MAIN_PANEL)
 
   pushPage(USER_PAGE, {id: "15"})
-  const r1 = getGlobalRouter().getRoute();
+  const r1 = getGlobalRouter().getCurrentLocation().route;
   expect(r1.getPageId()).toBe(USER_PAGE);
   expect(r1.getPanelId()).toBe(USER_PANEL);
   expect(r1.getParams()).toHaveProperty("id", "15")

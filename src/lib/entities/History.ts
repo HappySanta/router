@@ -1,6 +1,7 @@
 import {Route} from "./Route";
 import {State} from "./State";
-import {HistoryUpdateType} from "./Router";
+import {HistoryUpdateType} from "./Types";
+
 
 export const HISTORY_UPDATE_PUSH: HistoryUpdateType = "PUSH";
 export const HISTORY_UPDATE_REPLACE: HistoryUpdateType = "REPLACE";
@@ -26,6 +27,7 @@ export class History {
     current?.out();
     next?.in();
     if (next) {
+      this.setLastPanelInView(next, current)
       return [next, current, true, HISTORY_UPDATE_PUSH]
     } else {
       // Если мы только что запушили новое состояние то оно никак не может оказаться пустым
@@ -41,6 +43,7 @@ export class History {
     current?.out();
     next?.in();
     if (next) {
+      this.setLastPanelInView(next, current)
       return [next, current, true, HISTORY_UPDATE_REPLACE]
     } else {
       // Если мы только что заменили состояние то оно никак не может оказаться пустым
@@ -56,10 +59,11 @@ export class History {
     current?.out();
     next?.in();
     if (next) {
+      this.setLastPanelInView(next, current)
       return [next, current, false, HISTORY_UPDATE_MOVE]
     } else {
       // Если мы только что заменили состояние то оно никак не может оказаться пустым
-      // если оказалос то что-то не так
+      // если оказалось то что-то не так
       throw new Error("Impossible error on push state, next state is empty!")
     }
   }
@@ -117,6 +121,14 @@ export class History {
     return this.stack.slice(0, this.currentIndex)
   }
 
+  private setLastPanelInView = (next: Route, prev?: Route) => {
+    const state = this.getCurrentState()
+    if (!state) return
+    state.panelInView = {...state.panelInView, [next.getViewId()]: next.getPanelId()}
+    if (prev) {
+      state.panelInView = {...state.panelInView, [prev.getViewId()]: prev.getPanelId()}
+    }
+  };
 }
 
 
