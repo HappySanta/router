@@ -1,3 +1,8 @@
+/**
+ * @ignore
+ * @packageDocumentation
+ */
+
 import {useEffect, useState} from "react";
 import {Route} from "../..";
 import {useRouter} from "./useRouter";
@@ -5,6 +10,7 @@ import {useRouter} from "./useRouter";
 /**
  * @param withUpdate
  * @deprecated useRouter
+ * @ignore
  */
 export function useRoute(withUpdate: boolean = true): Route {
   const router = useRouter(false)

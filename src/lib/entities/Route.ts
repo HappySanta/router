@@ -1,9 +1,16 @@
 import {generatePath, MatchInterface, matchPath} from "../workWithPathRegexp"
 import * as qs from "querystring"
 import {Page} from "./Page";
-import {PageParams, RouteList} from "./Router";
+import {RouteList} from "./Router";
+import {PageParams} from "./Types";
 
+/**
+ * @ignore
+ */
 export const POPUP_KEY = 'p';
+/**
+ * @ignore
+ */
 export const MODAL_KEY = 'm';
 
 let routeUniqueId = 1;

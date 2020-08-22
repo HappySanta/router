@@ -1,19 +1,18 @@
 import React from "react";
-import {Page, RouteList, Router, RouterContext, useFirstPageCheck} from '..';
-import {useRouter} from "../lib/hooks/useRouter";
+import {Page, RouteList, Router, RouterContext, useFirstPageCheck, useLocation} from '..';
 import {act, cleanup, render} from '@testing-library/react';
 
 afterEach(cleanup);
 
 function Main() {
-  const router = useRouter()
-  const first = useFirstPageCheck();
-  return <span>{"Hello world: "+router.getPanelId() + " " + ( first ? "first_page" : "" )}</span>
+  const router = useLocation()
+  const first = useFirstPageCheck(true);
+  return <span>{"Hello world: " + router.getPanelId() + " " + (first ? "first_page" : "")}</span>
 }
 
 test('use router with hook', () => {
 
-  const list : RouteList = {
+  const list: RouteList = {
     "/": new Page('panel_main'),
     "/user": new Page('panel_user')
   }
@@ -30,9 +29,9 @@ test('use router with hook', () => {
   expect(component.queryByText(/panel_main/i)).toBeTruthy()
   expect(component.queryByText(/first_page/i)).toBeTruthy()
 
-  act( () => {
+  act(() => {
     router.pushPage("/user")
-  } )
+  })
 
   expect(component.queryByText(/panel_user/i)).toBeTruthy()
   expect(component.queryByText(/first_page/i)).toBeFalsy()

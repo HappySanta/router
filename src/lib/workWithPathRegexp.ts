@@ -1,3 +1,8 @@
+/**
+ * @ignore
+ * @packageDocumentation
+ */
+
 import * as ptr from 'path-to-regexp';
 import {ParseOptions, pathToRegexp, TokensToRegexpOptions} from 'path-to-regexp';
 import * as qs from 'querystring';
@@ -50,6 +55,7 @@ function convertPath(path: string, options?: TokensToRegexpOptions & ParseOption
  * @param pageId /user/:id
  * @param params {id:5,name:Ivan}
  * @return {string} /user/5?name=Ivan
+ * @ignore
  */
 export function generatePath(pageId: string, params?: Object): string {
   if (!params) {
@@ -69,6 +75,9 @@ export function generatePath(pageId: string, params?: Object): string {
   return result.replace(/\?$/gmu, "")
 }
 
+/**
+ * @ignore
+ */
 export interface MatchInterface {
   isExact: boolean
   path: string
@@ -80,6 +89,7 @@ export interface MatchInterface {
  * Проверка что строка удовлетворяет шаблону
  * @param location /user/5
  * @param pageId /user/:id([0-9]+)
+ * @ignore
  */
 export function matchPath(location: string, pageId: string): null | MatchInterface {
   const {regexp, keys} = convertPath(pageId, {

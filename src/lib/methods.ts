@@ -1,9 +1,21 @@
-import {PageParams, RouteList, Router} from "./entities/Router";
+/**
+ * Эти функции будут работать после вызова {@link setGlobalRouter}
+ * @packageDocumentation
+ */
+
+import {RouteList, Router} from "./entities/Router";
 import {Route} from "./entities/Route";
 import {RouterConfig} from "./entities/RouterConfig";
+import {__testResetHistoryUniqueId} from "./entities/State";
+import {PageParams} from "./entities/Types";
 
 let globalRouter: Router | null = null;
 
+/**
+ * @ignore
+ * @param routes
+ * @param config
+ */
 export function startGlobalRouter(routes: RouteList, config: RouterConfig | null = null): Router {
   if (globalRouter) {
     throw new Error('startGlobalRouter called twice is not allowed')
@@ -24,11 +36,18 @@ export function setGlobalRouter(router: Router) {
   globalRouter = router
 }
 
+/**
+ * @ignore
+ */
 export function dangerousResetGlobalRouterUseForTestOnly() {
   if (globalRouter) {
     globalRouter.stop()
     window.history.pushState(null, "", "")
   }
+  if (window.history.state) {
+    window.history.pushState(null, "", "")
+  }
+  __testResetHistoryUniqueId()
   globalRouter = null
 }
 
@@ -60,20 +79,24 @@ export function replacePopout(popupId: string, params: PageParams = {}) {
   return getGlobalRouter().replacePopup(popupId, params)
 }
 
+/**
+ * @deprecated use popPageIfHasOverlay
+ */
 export function popPageIfModalOrPopup() {
   return getGlobalRouter().popPageIfModalOrPopup()
+}
+
+export function popPageIfHasOverlay() {
+  return getGlobalRouter().popPageIfHasOverlay()
 }
 
 export function pushPageAfterPreviews(prevPageId: string, pageId: string, params: PageParams = {}) {
   return getGlobalRouter().pushPageAfterPreviews(prevPageId, pageId, params)
 }
 
-export function getLastPanelInView(viewId: string): string | undefined {
-  return getGlobalRouter().getLastPanelInView(viewId)
-}
-
 /**
  * @deprecated getCurrentStateOrDef
+ * @ignore
  */
 export function getCurrentRouterState() {
   return getCurrentStateOrDef();
@@ -85,6 +108,7 @@ export function getCurrentStateOrDef() {
 
 /**
  * @deprecated getCurrentRouteOrDef
+ * @ignore
  */
 export function getCurrentRoute(): Route {
   return getCurrentRouteOrDef();
@@ -92,18 +116,6 @@ export function getCurrentRoute(): Route {
 
 export function getCurrentRouteOrDef() {
   return getGlobalRouter().getCurrentRouteOrDef();
-}
-
-export function getViewHistory(viewId: string): string[] {
-  return getGlobalRouter().getViewHistory(viewId)
-}
-
-export function getViewHistoryWithLastPanel(viewId: string): string[] {
-  return getGlobalRouter().getViewHistoryWithLastPanel(viewId)
-}
-
-export function getPanelIdInView(viewId: string): string | undefined {
-  return getGlobalRouter().getPanelIdInView(viewId)
 }
 
 export function isInfinityPanel(panelId: string): boolean {
