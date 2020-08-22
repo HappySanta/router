@@ -11,3 +11,10 @@ test('from location', () => {
   expect(!!Route.fromLocation(list, location)).toBe(true)
   expect(!!Route.fromLocation(list, location, true)).toBe(true)
 })
+
+test("route clone", () => {
+  const page = new Page("vew_main", "panel_main").makeInfinity()
+  const route = new Route(page, "/", {id:"15"})
+
+  expect(JSON.stringify(route)).toEqual( JSON.stringify(route.clone()) )
+})
