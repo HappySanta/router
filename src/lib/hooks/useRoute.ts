@@ -1,3 +1,8 @@
+/**
+ * @ignore
+ * @packageDocumentation
+ */
+
 import {useEffect, useState} from "react";
 import {Route} from "../..";
 import {useRouter} from "./useRouter";

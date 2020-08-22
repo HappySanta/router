@@ -6,6 +6,10 @@ export interface ThrottlingRouterProps extends RouterProps {
   onTransitionEnd: () => void
 }
 
+/**
+ * Смотри описание {@link useThrottlingLocation}
+ * @param Component
+ */
 export function withThrottlingRouter<T>(Component: ComponentType<ThrottlingRouterProps & T>): ComponentType<T> {
   function withThrottlingRouter(props: T) {
     const router = useRouter(false)

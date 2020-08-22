@@ -5,6 +5,13 @@ import {Location} from "../..";
 // Магическое число милисекунд после которого можно обновлять VKUI и он не зависнет
 const UPDATE_INTERVAL: number = 900
 
+/**
+ * хук для обхода решения проблемы с слишком частой сменой панелей/попапов/модалок
+ * которая может приводить к зависанию всего приложения
+ *
+ * работает аналогично {@link useLocation} возвращяет функцию onTransitionEnd котору надо вызывать в колбеках onTransition компонента View
+ *
+ */
 export function useThrottlingLocation(): [Location, () => void] {
   const router = useRouter(true)
   const [location, setLocation] = useState<Location>(router.getCurrentLocation());

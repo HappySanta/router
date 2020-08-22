@@ -1,3 +1,8 @@
+/**
+ * @ignore
+ * @packageDocumentation
+ */
+
 import * as ptr from 'path-to-regexp';
 import {ParseOptions, pathToRegexp, TokensToRegexpOptions} from 'path-to-regexp';
 import * as qs from 'querystring';

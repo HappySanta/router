@@ -1,3 +1,8 @@
+/**
+ * Эти функции будут работать после вызова {@link setGlobalRouter}
+ * @packageDocumentation
+ */
+
 import {RouteList, Router} from "./entities/Router";
 import {Route} from "./entities/Route";
 import {RouterConfig} from "./entities/RouterConfig";

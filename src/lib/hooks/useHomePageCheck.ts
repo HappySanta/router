@@ -1,3 +1,8 @@
+/**
+ * @ignore
+ * @packageDocumentation
+ */
+
 import {useFirstPageCheck} from "./useFirstPageCheck";
 
 

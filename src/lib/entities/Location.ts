@@ -11,6 +11,10 @@ export class Location {
     this.state = state;
   }
 
+  /**
+   * @ignore
+   * @param viewId
+   */
   public getLastPanelInView(viewId: string): string | undefined {
     const state = this.state
     if (state && state.panelInView[viewId]) {
@@ -19,6 +23,25 @@ export class Location {
     return undefined
   }
 
+  /**
+   * Массив из id панелей для передачи в атрибут history <View>
+   *
+   * ```javascript
+   * import { useLocation } from '@happysanta/router';
+   *
+   * const App = () => {
+   *    const location = useLocation();
+   *    return <View id={VIEW_MAIN}
+   *                 history={location.getViewHistory(VIEW_MAIN)}
+   *                 activePanel={location.getViewActivePanel(VIEW_MAIN)}>
+   *           <Home id={PANEL_MAIN}/>
+   *           <Persik id={PANEL_PERSIK}/>
+   *    </View>
+   * }
+   * ```
+   *
+   * @param viewId
+   */
   public getViewHistory(viewId: string): string[] {
     const route = this.route
     const state = this.state
@@ -45,6 +68,7 @@ export class Location {
 
   /**
    * @deprecated use getViewActivePanel
+   * @ignore
    * @param viewId
    */
   public getPanelIdInView(viewId: string): string | undefined {
