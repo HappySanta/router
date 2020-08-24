@@ -11,3 +11,12 @@ export function preventBlinkingBySettingScrollRestoration() {
     window.history.scrollRestoration = 'manual'
   }
 }
+
+
+/**
+ * @ignore
+ * @param WrappedComponent
+ */
+export function getDisplayName(WrappedComponent:{displayName?:string,name?:string}) {
+  return WrappedComponent.displayName || WrappedComponent.name || 'Component';
+}

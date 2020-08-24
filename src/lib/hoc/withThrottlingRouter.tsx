@@ -1,6 +1,7 @@
 import React, {ComponentType} from "react";
 import {useRouter, useThrottlingLocation} from "../..";
 import {RouterProps} from "./withRouter";
+import {getDisplayName} from "../tools";
 
 export interface ThrottlingRouterProps extends RouterProps {
   onTransitionEnd: () => void
@@ -11,7 +12,7 @@ export interface ThrottlingRouterProps extends RouterProps {
  * @param Component
  */
 export function withThrottlingRouter<T>(Component: ComponentType<ThrottlingRouterProps & T>): ComponentType<T> {
-  function withThrottlingRouter(props: T) {
+  function WithThrottlingRouter(props: T) {
     const router = useRouter(false)
     const [location, onTransitionEnd] = useThrottlingLocation()
     return <Component {...props}
@@ -21,6 +22,6 @@ export function withThrottlingRouter<T>(Component: ComponentType<ThrottlingRoute
                       location={location}
                       route={location.route}/>;
   }
-
-  return withThrottlingRouter;
+  WithThrottlingRouter.displayName = `WithThrottlingRouter(${getDisplayName(Component)})`;
+  return WithThrottlingRouter;
 }

@@ -16,3 +16,4 @@ import {Router} from "./Router";
  * ```
  */
 export const RouterContext = React.createContext<Router | null>(null);
+RouterContext.displayName = "Router"

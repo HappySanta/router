@@ -1,5 +1,6 @@
 import React, {ComponentType} from "react";
 import {Location, PageParams, Route, Router, State, useParams, useRouter} from "../..";
+import {getDisplayName} from "../tools";
 
 export interface RouterProps {
   /**
@@ -58,7 +59,7 @@ export function withRouter<T>(Component: ComponentType<RouterProps & T>, withUpd
                       routeState={router.getCurrentStateOrDef()}
                       route={router.getCurrentRouteOrDef()}/>;
   }
-
+  WithRouter.displayName = `WithRouter(${getDisplayName(Component)})`;
   return WithRouter;
 }
 
@@ -76,6 +77,6 @@ export function withParams<T>(Component: ComponentType<RouterParams & T>): Compo
     const params = useParams()
     return <Component {...props} params={params}/>;
   }
-
+  WithParams.displayName = `WithParams(${getDisplayName(Component)})`;
   return WithParams;
 }
