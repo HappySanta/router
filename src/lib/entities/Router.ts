@@ -186,7 +186,7 @@ export class Router extends EventEmitter<{
   }
 
   pushPageAfterPreviews(prevPageId: string, pageId: string, params: PageParams = {}) {
-    const offset = this.getPageOffset(prevPageId) - 1;
+    const offset = this.history.getPageOffset(prevPageId);
     if (this.history.canJumpIntoOffset(offset)) {
       return this.popPageToAndPush(offset, pageId, params);
     } else {
@@ -231,15 +231,6 @@ export class Router extends EventEmitter<{
       window.history.pushState(s, "page=" + s.index, '#' + r.getLocation());
     });
     this.startHistoryOffset = window.history.length - this.history.getLength();
-  }
-
-  /**
-   * @param pageId
-   * @return number на сколько страниц назад надо откатиться чтобы дойти до искомой страницы
-   * если вернется - 0 то страница не найдена в истории
-   */
-  getPageOffset(pageId: string): number {
-    return this.history.getPageOffset(pageId)
   }
 
   /**

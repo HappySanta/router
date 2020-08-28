@@ -27,15 +27,19 @@ test('route basic usage', async (done) => {
   }))
 
   r.start()
-
+  expect(r.history.getCurrentIndex()).toBe(0)
   r.pushPage("/user")
+  expect(r.history.getCurrentIndex()).toBe(1)
   await delay(10)
   r.pushPage("/info")
+  expect(r.history.getCurrentIndex()).toBe(2)
   await delay(10)
   r.popPage()
   await delay(10)
+  expect(r.history.getCurrentIndex()).toBe(1)
   r.replacePage("/info")
   await delay(10)
+  expect(r.history.getCurrentIndex()).toBe(1)
 
   setTimeout(() => {
     // одно событие update приходит после старта роутера
