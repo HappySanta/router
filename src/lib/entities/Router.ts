@@ -186,6 +186,7 @@ export class Router extends EventEmitter<{
   }
 
   pushPageAfterPreviews(prevPageId: string, pageId: string, params: PageParams = {}) {
+    this.log("pushPageAfterPreviews", [prevPageId, params, params]);
     const offset = this.history.getPageOffset(prevPageId);
     if (this.history.canJumpIntoOffset(offset)) {
       return this.popPageToAndPush(offset, pageId, params);
@@ -194,14 +195,31 @@ export class Router extends EventEmitter<{
     }
   }
 
+  /**
+   * Переход по истории назад
+   */
   popPage() {
     this.log("popPage");
     Router.back();
   }
 
-  popPageTo(x: number) {
+  /**
+   * Если x - число, то осуществляется переход на указанное количество шагов назад
+   * Если x - строка, то в истории будет найдена страница с указанным pageId и осуществлен переход до нее
+   * @param {string|number} x
+   */
+  popPageTo(x: number|string) {
     this.log("popPageTo", x);
-    Router.backTo(x);
+    if (typeof x === 'number') {
+      Router.backTo(x);
+    } else {
+      const offset = this.history.getPageOffset(x);
+      if (this.history.canJumpIntoOffset(offset)) {
+        Router.backTo(offset);
+      } else {
+        throw new Error(`Unexpected offset ${offset} then try jump to page ${x}`)
+      }
+    }
   }
 
   popPageToAndPush(x: number, pageId: string, params: PageParams = {}) {

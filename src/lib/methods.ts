@@ -79,6 +79,10 @@ export function replacePopout(popupId: string, params: PageParams = {}) {
   return getGlobalRouter().replacePopup(popupId, params)
 }
 
+export function popPageTo(x: number|string) {
+  return getGlobalRouter().popPageTo(x)
+}
+
 /**
  * @deprecated use popPageIfHasOverlay
  */
