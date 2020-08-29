@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>&quot;hooks/useThrottlingLocation&quot; | @happysanta/router</title>
+	<title>&quot;test/tools&quot; | @happysanta/router</title>
 	<meta name="description" content="Documentation for @happysanta/router">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -52,10 +52,10 @@
 					<a href="../globals.html">Globals</a>
 				</li>
 				<li>
-					<a href="_hooks_usethrottlinglocation_.html">&quot;hooks/useThrottlingLocation&quot;</a>
+					<a href="_test_tools_.html">&quot;test/tools&quot;</a>
 				</li>
 			</ul>
-			<h1>Module &quot;hooks/useThrottlingLocation&quot;</h1>
+			<h1>Module &quot;test/tools&quot;</h1>
 		</div>
 	</div>
 </header>
@@ -69,7 +69,7 @@
 						<section class="tsd-index-section ">
 							<h3>Functions</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-function tsd-parent-kind-module"><a href="_hooks_usethrottlinglocation_.html#usethrottlinglocation" class="tsd-kind-icon">use<wbr>Throttling<wbr>Location</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="_test_tools_.html#delay" class="tsd-kind-icon">delay</a></li>
 							</ul>
 						</section>
 					</div>
@@ -78,26 +78,25 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Functions</h2>
 				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
-					<a name="usethrottlinglocation" class="tsd-anchor"></a>
-					<h3>use<wbr>Throttling<wbr>Location</h3>
+					<a name="delay" class="tsd-anchor"></a>
+					<h3>delay</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
-						<li class="tsd-signature tsd-kind-icon">use<wbr>Throttling<wbr>Location<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">[</span><a href="../classes/_entities_location_.location.html" class="tsd-signature-type">Location</a><span class="tsd-signature-symbol">, </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">]</span></li>
+						<li class="tsd-signature tsd-kind-icon">delay<span class="tsd-signature-symbol">(</span>time<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/HappySanta/router/blob/691df7f/src/lib/hooks/useThrottlingLocation.ts#L15">src/lib/hooks/useThrottlingLocation.ts:15</a></li>
+									<li>Defined in <a href="https://github.com/HappySanta/router/blob/055675c/src/test/tools.ts#L2">src/test/tools.ts:2</a></li>
 								</ul>
 							</aside>
-							<div class="tsd-comment tsd-typography">
-								<div class="lead">
-									<p>хук для обхода решения проблемы с слишком частой сменой панелей/попапов/модалок
-									которая может приводить к зависанию всего приложения</p>
-								</div>
-								<p>работает аналогично <a href="_hooks_userouter_.html#uselocation">useLocation</a> возвращяет функцию onTransitionEnd котору надо вызывать в колбеках onTransition компонента View</p>
-							</div>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-symbol">[</span><a href="../classes/_entities_location_.location.html" class="tsd-signature-type">Location</a><span class="tsd-signature-symbol">, </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">]</span></h4>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> time: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = 20</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">&gt;</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -110,50 +109,53 @@
 						<a href="../globals.html"><em>Globals</em></a>
 					</li>
 					<li class=" tsd-kind-module">
-						<a href="_entities_location_.html">&quot;entities/<wbr>Location&quot;</a>
+						<a href="_lib_entities_location_.html">&quot;lib/entities/<wbr>Location&quot;</a>
 					</li>
 					<li class=" tsd-kind-module">
-						<a href="_entities_page_.html">&quot;entities/<wbr>Page&quot;</a>
+						<a href="_lib_entities_page_.html">&quot;lib/entities/<wbr>Page&quot;</a>
 					</li>
 					<li class=" tsd-kind-module">
-						<a href="_entities_route_.html">&quot;entities/<wbr>Route&quot;</a>
+						<a href="_lib_entities_route_.html">&quot;lib/entities/<wbr>Route&quot;</a>
 					</li>
 					<li class=" tsd-kind-module">
-						<a href="_entities_router_.html">&quot;entities/<wbr>Router&quot;</a>
+						<a href="_lib_entities_router_.html">&quot;lib/entities/<wbr>Router&quot;</a>
 					</li>
 					<li class=" tsd-kind-module">
-						<a href="_entities_routerconfig_.html">&quot;entities/<wbr>Router<wbr>Config&quot;</a>
+						<a href="_lib_entities_routerconfig_.html">&quot;lib/entities/<wbr>Router<wbr>Config&quot;</a>
 					</li>
 					<li class=" tsd-kind-module">
-						<a href="_entities_routercontext_.html">&quot;entities/<wbr>Router<wbr>Context&quot;</a>
+						<a href="_lib_entities_routercontext_.html">&quot;lib/entities/<wbr>Router<wbr>Context&quot;</a>
 					</li>
 					<li class=" tsd-kind-module">
-						<a href="_entities_types_.html">&quot;entities/<wbr>Types&quot;</a>
+						<a href="_lib_entities_types_.html">&quot;lib/entities/<wbr>Types&quot;</a>
 					</li>
 					<li class=" tsd-kind-module">
-						<a href="_hoc_withrouter_.html">&quot;hoc/with<wbr>Router&quot;</a>
+						<a href="_lib_hoc_withrouter_.html">&quot;lib/hoc/with<wbr>Router&quot;</a>
 					</li>
 					<li class=" tsd-kind-module">
-						<a href="_hoc_withthrottlingrouter_.html">&quot;hoc/with<wbr>Throttling<wbr>Router&quot;</a>
+						<a href="_lib_hoc_withthrottlingrouter_.html">&quot;lib/hoc/with<wbr>Throttling<wbr>Router&quot;</a>
 					</li>
 					<li class=" tsd-kind-module">
-						<a href="_hooks_usefirstpagecheck_.html">&quot;hooks/use<wbr>First<wbr>Page<wbr>Check&quot;</a>
+						<a href="_lib_hooks_usefirstpagecheck_.html">&quot;lib/hooks/use<wbr>First<wbr>Page<wbr>Check&quot;</a>
 					</li>
 					<li class=" tsd-kind-module">
-						<a href="_hooks_userouter_.html">&quot;hooks/use<wbr>Router&quot;</a>
+						<a href="_lib_hooks_userouter_.html">&quot;lib/hooks/use<wbr>Router&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="_lib_hooks_usethrottlinglocation_.html">&quot;lib/hooks/use<wbr>Throttling<wbr>Location&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="_lib_methods_.html">&quot;lib/methods&quot;</a>
 					</li>
 					<li class="current tsd-kind-module">
-						<a href="_hooks_usethrottlinglocation_.html">&quot;hooks/use<wbr>Throttling<wbr>Location&quot;</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="_methods_.html">&quot;methods&quot;</a>
+						<a href="_test_tools_.html">&quot;test/tools&quot;</a>
 					</li>
 				</ul>
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
 					<li class=" tsd-kind-function tsd-parent-kind-module">
-						<a href="_hooks_usethrottlinglocation_.html#usethrottlinglocation" class="tsd-kind-icon">use<wbr>Throttling<wbr>Location</a>
+						<a href="_test_tools_.html#delay" class="tsd-kind-icon">delay</a>
 					</li>
 				</ul>
 			</nav>
