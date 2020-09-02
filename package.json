@@ -7,7 +7,7 @@
   "scripts": {
     "build": "tsc && ./node_modules/.bin/babel src --out-dir dist --extensions '.ts,.tsx'",
     "test": "jest",
-    "pub": "yarn run test && yarn run build && yarn publish",
+    "pub": "yarn version --patch && yarn run test && yarn run build && yarn publish",
     "fix-for-link": "rm -rf node_modules/react node_modules/react-dom",
     "fix-for-test": "rm -rf node_modules && rm package-lock.json  && yarn install",
     "docs": "./node_modules/.bin/typedoc --externalPattern 'src/index.ts' --exclude **/*.spec.ts* --excludeExternals --excludeNotExported --out docs src/"
