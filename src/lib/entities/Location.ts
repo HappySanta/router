@@ -100,6 +100,10 @@ export class Location {
     return this.route.getPopupId()
   }
 
+  public getPageId():string {
+    return this.route.getPageId()
+  }
+
   public getParams(): PageParams {
     return this.route.getParams()
   }

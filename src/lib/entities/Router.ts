@@ -415,6 +415,9 @@ export class Router extends EventEmitter<{
     let nextRoute = this.createRouteFromLocationWithReplace();
     const state = stateFromLocation(this.history.getCurrentIndex());
     if (state.blank === 1) {
+      // Пустое состояние бывает когда приложение восстанавливают из кеша с другим хешом
+      // такое состояние помечаем как первая страница
+      state.first = 1;
       state.index = this.history.getCurrentIndex();
       state.history = [nextRoute.getPanelId()];
       this.emit("enter", nextRoute, this.history.getCurrentRoute());
