@@ -1,9 +1,9 @@
-import {PANEL_MAIN, VIEW_MAIN} from "../const";
+import { PANEL_MAIN, VIEW_MAIN } from '../const';
 
 export class Page {
   public panelId: string;
   public viewId: string;
-  public isInfinityPanel: boolean = false;
+  public isInfinityPanel = false;
 
   constructor(panelId = PANEL_MAIN, viewId = VIEW_MAIN) {
     this.panelId = panelId;
@@ -11,13 +11,13 @@ export class Page {
   }
 
   clone() {
-    const p = new Page(this.panelId, this.viewId)
-    p.isInfinityPanel = this.isInfinityPanel
-    return p
+    const p = new Page(this.panelId, this.viewId);
+    p.isInfinityPanel = this.isInfinityPanel;
+    return p;
   }
 
   makeInfinity() {
     this.isInfinityPanel = true;
-    return this
+    return this;
   }
 }
