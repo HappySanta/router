@@ -4,7 +4,6 @@
   ],
   "env": {
     "es6": true,
-    "jest": true,
     "browser": true,
     "node": true
   },
@@ -18,7 +17,22 @@
       "spread": true
     }
   },
+  "overrides": [
+    {
+      "files": [
+        "*.spec.ts",
+        "*.spec.tsx"
+      ],
+      "env": {
+        "jest": true
+      },
+      "parserOptions": {
+        "project": "./tsconfig.test.json"
+      }
+    }
+  ],
   "rules": {
+    "prefer-template": "error",
     "@typescript-eslint/camelcase": "off",
     "@typescript-eslint/class-name-casing": "off",
     "@typescript-eslint/explicit-member-accessibility": "off",

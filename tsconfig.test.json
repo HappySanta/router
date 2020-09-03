@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "strict": true,
+    "isolatedModules": true,
+    "target": "ESNext",
+    "declaration": true,
+    "outDir": "./dist",
+    "esModuleInterop": true,
+    "jsx": "react",
+    "noUnusedLocals": true,
+    "noImplicitThis": true,
+    "noImplicitReturns": true,
+    "noImplicitAny": true,
+    "noFallthroughCasesInSwitch": true
+  },
+  "include": [
+    "**/*.spec.ts",
+    "**/*.spec.tsx",
+    "test"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "./pub-docs.js"
+  ]
+}

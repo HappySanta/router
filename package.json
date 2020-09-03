@@ -7,7 +7,7 @@
   "scripts": {
     "build": "tsc && ./node_modules/.bin/babel src --out-dir dist --extensions '.ts,.tsx'",
     "test": "jest",
-    "lint": "eslint --fix --ext .js,.jsx,.ts,.tsx --ignore-path .gitignore .",
+    "lint": "eslint --fix --ext .ts,.tsx src",
     "pub": "yarn version --patch && yarn run test && yarn run build && yarn publish",
     "fix-for-link": "rm -rf node_modules/react node_modules/react-dom",
     "fix-for-test": "rm -rf node_modules && rm package-lock.json  && yarn install",
