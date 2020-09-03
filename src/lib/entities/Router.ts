@@ -1,5 +1,5 @@
 import {Page} from "./Page";
-import {History} from "./History";
+import {History, UpdateEventType} from "./History";
 import {MODAL_KEY, POPUP_KEY, Route as MyRoute} from "./Route";
 import {preventBlinkingBySettingScrollRestoration} from "../tools";
 import {State, stateFromLocation} from "./State";
@@ -102,17 +102,21 @@ export class Router extends EventEmitter<{
     }
     this.started = true;
 
+    let enterEvent:[MyRoute, MyRoute|undefined]|null = null
     this.startHistoryOffset = window.history.length;
     let nextRoute = this.createRouteFromLocationWithReplace();
     const state = stateFromLocation(this.history.getCurrentIndex());
     state.first = 1;
     if (state.blank === 1) {
-      this.emit("enter", nextRoute, this.history.getCurrentRoute());
+      enterEvent = [nextRoute, this.history.getCurrentRoute()];
       state.history = [nextRoute.getPanelId()]
     }
     this.replace(state, nextRoute);
     window.removeEventListener("popstate", this.onPopState);
     window.addEventListener("popstate", this.onPopState);
+    if (enterEvent) {
+      this.emit("enter", ...enterEvent)
+    }
   }
 
   stop() {
@@ -186,7 +190,7 @@ export class Router extends EventEmitter<{
   }
 
   pushPageAfterPreviews(prevPageId: string, pageId: string, params: PageParams = {}) {
-    this.log("pushPageAfterPreviews", [prevPageId, params, params]);
+    this.log("pushPageAfterPreviews", [prevPageId, pageId, params]);
     const offset = this.history.getPageOffset(prevPageId);
     if (this.history.canJumpIntoOffset(offset)) {
       return this.popPageToAndPush(offset, pageId, params);
@@ -208,7 +212,7 @@ export class Router extends EventEmitter<{
    * Если x - строка, то в истории будет найдена страница с указанным pageId и осуществлен переход до нее
    * @param {string|number} x
    */
-  popPageTo(x: number|string) {
+  popPageTo(x: number | string) {
     this.log("popPageTo", x);
     if (typeof x === 'number') {
       Router.backTo(x);
@@ -405,6 +409,23 @@ export class Router extends EventEmitter<{
   }
 
   private onPopState = () => {
+    let nextRoute = this.createRouteFromLocationWithReplace();
+    const state = stateFromLocation(this.history.getCurrentIndex());
+    let enterEvent: [MyRoute, MyRoute | undefined] | null = null
+    let updateEvent: UpdateEventType | null = null
+    if (state.blank === 1) {
+      // Пустое состояние бывает когда приложение восстанавливают из кеша с другим хешом
+      // такое состояние помечаем как первая страница
+      state.first = 1;
+      state.index = this.history.getCurrentIndex();
+      state.history = [nextRoute.getPanelId()];
+      enterEvent = [nextRoute, this.history.getCurrentRoute()]
+      updateEvent = this.history.push(nextRoute, state)
+      window.history.replaceState(state, "page=" + state.index, '#' + nextRoute.getLocation());
+    } else {
+      updateEvent = this.history.setCurrentIndex(state.index)
+    }
+
     if (this.deferOnGoBack) {
       this.log("onPopStateInDefer");
       this.deferOnGoBack();
@@ -412,41 +433,37 @@ export class Router extends EventEmitter<{
       return
     }
 
-    let nextRoute = this.createRouteFromLocationWithReplace();
-    const state = stateFromLocation(this.history.getCurrentIndex());
-    if (state.blank === 1) {
-      // Пустое состояние бывает когда приложение восстанавливают из кеша с другим хешом
-      // такое состояние помечаем как первая страница
-      state.first = 1;
-      state.index = this.history.getCurrentIndex();
-      state.history = [nextRoute.getPanelId()];
-      this.emit("enter", nextRoute, this.history.getCurrentRoute());
-      this.emit("update", ...this.history.push(nextRoute, state));
-      window.history.replaceState(state, "page=" + state.index, '#' + nextRoute.getLocation());
-    } else {
-      this.emit("update", ...this.history.setCurrentIndex(state.index));
-    }
-
     this.log("onPopState", [nextRoute, this.history.getCurrentRoute(), state]);
+
+    if (enterEvent) {
+      this.emit("enter", ...enterEvent);
+    }
+    if (updateEvent) {
+      this.emit("update", ...updateEvent);
+    }
   };
 
   private replace(state: State, nextRoute: MyRoute) {
     state.length = window.history.length;
     state.index = this.history.getCurrentIndex();
     state.blank = 0;
-    this.emit("update", ...this.history.replace(nextRoute, state));
+    const updateEvent = this.history.replace(nextRoute, state)
     window.history.replaceState(state, "page=" + state.index, '#' + nextRoute.getLocation());
     preventBlinkingBySettingScrollRestoration();
+
+    this.emit("update", ...updateEvent);
   }
 
   private push(state: State, nextRoute: MyRoute) {
     state.length = window.history.length;
     state.blank = 0;
     state.first = 0;
-    this.emit("update", ...this.history.push(nextRoute, state));
+    let updateEvent = this.history.push(nextRoute, state)
     state.index = this.history.getCurrentIndex();
     window.history.pushState(state, "page=" + state.index, '#' + nextRoute.getLocation());
     preventBlinkingBySettingScrollRestoration();
+
+    this.emit("update", ...updateEvent);
   }
 
   private createRouteFromLocationWithReplace() {
@@ -473,13 +490,23 @@ export class Router extends EventEmitter<{
     }
   }
 
-  afterUpdate() {
-    return new Promise( (resolve) => {
+  /**
+   * @param safety - true будет ждать события не дольше 700мс, если вы уверены что надо ждать дольше передайте false
+   */
+  afterUpdate(safety = true):Promise<void> {
+    return new Promise((resolve) => {
+      let t:number = 0
       const fn = () => {
-        resolve()
+        clearTimeout(t)
         this.off("update", fn)
+        resolve()
       }
       this.on("update", fn)
-    } )
+      if (safety) {
+        // На случай когда метод ошибочно используется не после popPage
+        // чтобы не завис навечно
+        t = setTimeout(fn, 700) as any as number
+      }
+    })
   }
 }

@@ -37,7 +37,7 @@ export class History {
   push(r: Route, s: State): UpdateEventType {
     const current = this.getCurrentRoute();
     if (this.getCurrentIndex() !== this.getLength() - 1) {
-      //Пуш после отката назад, в этом случае вся история "впереди удаляется"
+      // Пуш после отката назад, в этом случае вся история "впереди" удаляется
       this.stack = this.stack.slice(0, this.getCurrentIndex() + 1);
     }
     this.stack.push([r, s]);
@@ -50,7 +50,7 @@ export class History {
       return [next, current, true, HISTORY_UPDATE_PUSH]
     } else {
       // Если мы только что запушили новое состояние то оно никак не может оказаться пустым
-      // если оказалос то что-то не так
+      // если оказалось то что-то не так
       throw new Error("Impossible error on push state, next state is empty!")
     }
   }
