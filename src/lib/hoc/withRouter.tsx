@@ -1,39 +1,37 @@
-import React, {ComponentType} from "react";
-import {Location, PageParams, Route, Router, State, useParams, useRouter} from "../..";
-import {getDisplayName} from "../tools";
+import React, { ComponentType } from 'react';
+import { Location, PageParams, Route, Router, State, useParams, useRouter } from '../..';
+import { getDisplayName } from '../tools';
 
 export interface RouterProps {
   /**
    * @deprecated
    */
-  routeState: State,
+  routeState: State;
 
   /**
    * @deprecated
    */
-  route: Route,
+  route: Route;
 
-  router: Router,
-  location: Location,
+  router: Router;
+  location: Location;
 }
 
 export interface RouterParams {
-  params: PageParams,
+  params: PageParams;
 }
 
 /**
  * @deprecated use RouterProps
  */
-export interface SantaRouterProps extends RouterProps {
-
-}
+export type SantaRouterProps = RouterProps;
 
 /**
  * @deprecated use withRouter
  * @ignore
  */
 export function withSantaRouter<T>(Component: ComponentType<RouterProps & T>): ComponentType<T> {
-  return withRouter<T>(Component)
+  return withRouter<T>(Component);
 }
 
 /**
@@ -50,14 +48,14 @@ export function withSantaRouter<T>(Component: ComponentType<RouterProps & T>): C
  * @param Component
  * @param withUpdate true - обновлять изменении при изменении location false - не обновлять
  */
-export function withRouter<T>(Component: ComponentType<RouterProps & T>, withUpdate: boolean = true): ComponentType<T> {
+export function withRouter<T>(Component: ComponentType<RouterProps & T>, withUpdate = true): ComponentType<T> {
   function WithRouter(props: T) {
-    const router = useRouter(withUpdate)
+    const router = useRouter(withUpdate);
     return <Component {...props}
-                      router={router}
-                      location={router.getCurrentLocation()}
-                      routeState={router.getCurrentStateOrDef()}
-                      route={router.getCurrentRouteOrDef()}/>;
+      router={router}
+      location={router.getCurrentLocation()}
+      routeState={router.getCurrentStateOrDef()}
+      route={router.getCurrentRouteOrDef()} />;
   }
   WithRouter.displayName = `WithRouter(${getDisplayName(Component)})`;
   return WithRouter;
@@ -74,8 +72,8 @@ export function withRouter<T>(Component: ComponentType<RouterProps & T>, withUpd
  */
 export function withParams<T>(Component: ComponentType<RouterParams & T>): ComponentType<T> {
   function WithParams(props: T) {
-    const params = useParams()
-    return <Component {...props} params={params}/>;
+    const params = useParams();
+    return <Component {...props} params={params} />;
   }
   WithParams.displayName = `WithParams(${getDisplayName(Component)})`;
   return WithParams;

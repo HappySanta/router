@@ -1,8 +1,8 @@
-import {generatePath, MatchInterface, matchPath} from "../workWithPathRegexp"
-import * as qs from "querystring"
-import {Page} from "./Page";
-import {RouteList} from "./Router";
-import {PageParams} from "./Types";
+import { generatePath, MatchInterface, matchPath } from '../workWithPathRegexp';
+import * as qs from 'querystring';
+import { Page } from './Page';
+import { RouteList } from './Router';
+import { PageParams } from './Types';
 
 /**
  * @ignore
@@ -16,7 +16,7 @@ export const MODAL_KEY = 'm';
 let routeUniqueId = 1;
 
 function getNextUniqId() {
-  return routeUniqueId++
+  return routeUniqueId++;
 }
 
 export class Route {
@@ -28,7 +28,6 @@ export class Route {
   params: PageParams = {};
   uniqId: number;
 
-
   constructor(structure: Page, pageId: string, params: PageParams) {
     this.structure = structure;
     this.pageId = pageId;
@@ -37,9 +36,9 @@ export class Route {
   }
 
   static getParamsFromPath(location: string) {
-    return location.indexOf('?') !== -1
+    return location.includes('?')
       ? (qs.parse(location.split('?', 2)[1]) as { [key: string]: string })
-      : {}
+      : {};
   }
 
   /**
@@ -47,90 +46,90 @@ export class Route {
    * @param location "info?w=about&show=1" то, что лежит в window.location.hash
    * @param noSlash
    */
-  static fromLocation(routeList: RouteList, location: string, noSlash: boolean = true) {
+  static fromLocation(routeList: RouteList, location: string, noSlash = true) {
     const params = Route.getParamsFromPath(location);
-    location = location.replace("#", '');
-    if (noSlash && location.length && location[0] !== '/') {
-      location = '/' + location
+    location = location.replace('#', '');
+    if (noSlash && location.length && !location.startsWith('/')) {
+      location = `/${location}`;
     }
     if (noSlash && !location.length) {
-      location = '/' + location
+      location = `/${location}`;
     }
-    location = location.split("?", 2).shift() || (noSlash ? "/" : "");
+    location = location.split('?', 2).shift() || (noSlash ? '/' : '');
 
     let match: null | MatchInterface = null;
     for (let pageId in routeList) {
       if (routeList.hasOwnProperty(pageId)) {
         match = matchPath(location, pageId);
         if (match && match.isExact) {
-          break
+          break;
         }
       }
     }
 
     if (!match) {
-      throw new Error("ROUTE_NOT_FOUND")
+      throw new Error('ROUTE_NOT_FOUND');
     }
 
     const ps = routeList[match.path];
     if (!ps) {
-      throw new Error("Router fail: cant find structure in routes for " + location)
+      throw new Error(`Router fail: cant find structure in routes for ${location}`);
     }
-    return new Route(ps, match.path, {...params, ...match.params});
+    return new Route(ps, match.path, { ...params, ...match.params });
   }
 
   static fromPageId(routeList: RouteList, pageId: string, params?: PageParams) {
     const ps = routeList[pageId];
     if (!ps) {
-      throw new Error("Router fail: cant find structure in routes for " + pageId)
+      throw new Error(`Router fail: cant find structure in routes for ${pageId}`);
     }
-    return new Route(ps, pageId, params || ({} as PageParams))
+    return new Route(ps, pageId, params || {});
   }
 
   clone(): Route {
-    const copy = new Route(this.structure.clone(), this.pageId, {...this.params});
+    const copy = new Route(this.structure.clone(), this.pageId, { ...this.params });
     copy.uniqId = this.uniqId;
     return copy;
   }
 
   getLocation() {
-    return generatePath(this.pageId, this.params)
+    return generatePath(this.pageId, this.params);
   }
 
   getPageId() {
-    return this.pageId
+    return this.pageId;
   }
 
   getPanelId(): string {
     if (this.structure.isInfinityPanel) {
-      return "_" + this.structure.panelId + '..' + this.uniqId
+      return `_${this.structure.panelId}..${String(this.uniqId)}`;
     }
-    return this.structure.panelId
+    return this.structure.panelId;
   }
 
   getPanelIdWithoutInfinity(): string {
-    return this.structure.panelId
+    return this.structure.panelId;
   }
 
   getViewId() {
-    return this.structure.viewId
+    return this.structure.viewId;
   }
 
   getParams(): PageParams {
-    return this.params
+    return this.params;
   }
 
   setParams(params: PageParams = {}): Route {
-    this.params = {...this.params, ...params};
+    this.params = { ...this.params, ...params };
     return this;
   }
 
   isPopup(): boolean {
-    return !!this.getPopupId()
+    return !!this.getPopupId();
   }
 
   getPopupId(): string | null {
-    return (this.params[POPUP_KEY]?.toString()) || null
+    return this.params[POPUP_KEY]?.toString() || null;
   }
 
   setPopupId(popupId: string): Route {
@@ -139,15 +138,15 @@ export class Route {
   }
 
   isModal(): boolean {
-    return !!this.getModalId()
+    return !!this.getModalId();
   }
 
   hasOverlay() {
-    return this.isModal() || this.isPopup()
+    return this.isModal() || this.isPopup();
   }
 
   getModalId(): string | null {
-    return (this.params[MODAL_KEY]?.toString()) || null
+    return this.params[MODAL_KEY]?.toString() || null;
   }
 
   setModalId(modalId: string): Route {
@@ -156,10 +155,10 @@ export class Route {
   }
 
   out() {
-
+    // $TSFixMe
   }
 
   in() {
-
+    // $TSFixMe
   }
 }

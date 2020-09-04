@@ -1,5 +1,5 @@
-import React from "react";
-import {Router} from "./Router";
+import React from 'react';
+import { Router } from './Router';
 
 /**
  * Все приложение необходимо оборачивать в контекст для корректной работы {@link withRouter} {@link useRouter}
@@ -16,4 +16,4 @@ import {Router} from "./Router";
  * ```
  */
 export const RouterContext = React.createContext<Router | null>(null);
-RouterContext.displayName = "Router"
+RouterContext.displayName = 'Router';

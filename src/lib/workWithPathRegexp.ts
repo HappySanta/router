@@ -4,16 +4,17 @@
  */
 
 import * as ptr from 'path-to-regexp';
-import {ParseOptions, pathToRegexp, TokensToRegexpOptions} from 'path-to-regexp';
 import * as qs from 'querystring';
 
 const cache: Map<string, [ptr.PathFunction, ptr.Token[]]> = new Map<string, [ptr.PathFunction, ptr.Token[]]>();
-const cacheLimit: number = 10000;
-let cacheCount: number = 0;
+const cacheLimit = 10000;
+let cacheCount = 0;
 
 function parsePath(pageId: string): [ptr.PathFunction, ptr.Token[]] {
   const cached = cache.get(pageId);
-  if (cached) return cached;
+  if (cached) {
+    return cached;
+  }
   const tokens = ptr.parse(pageId);
   const generator = ptr.tokensToFunction(tokens);
 
@@ -24,24 +25,24 @@ function parsePath(pageId: string): [ptr.PathFunction, ptr.Token[]] {
   return [generator, tokens];
 }
 
-
 interface CachedPath {
-  regexp: RegExp,
-  keys: ptr.Token[]
+  regexp: RegExp;
+  keys: ptr.Token[];
 }
 
 const convertCache = new Map<string, CachedPath>();
 
-function convertPath(path: string, options?: TokensToRegexpOptions & ParseOptions): CachedPath {
-  const cacheKey = `${options?.end ? "1" : "0"}${options?.strict}${options?.sensitive}${path}`;
+function convertPath(path: string, options?: ptr.TokensToRegexpOptions & ptr.ParseOptions): CachedPath {
+  const cacheKey = `${options?.end ? '1' : '0'}${options?.strict}${options?.sensitive}${path}`;
   const pathCache = convertCache.get(cacheKey);
 
-  if (pathCache) return pathCache;
-
+  if (pathCache) {
+    return pathCache;
+  }
 
   const keys: ptr.Key[] = [];
-  const regexp = pathToRegexp(path, keys)
-  const result = {regexp, keys};
+  const regexp = ptr.pathToRegexp(path, keys);
+  const result = { regexp, keys };
 
   if (cacheCount < cacheLimit) {
     convertCache.set(cacheKey, result);
@@ -57,32 +58,32 @@ function convertPath(path: string, options?: TokensToRegexpOptions & ParseOption
  * @return {string} /user/5?name=Ivan
  * @ignore
  */
-export function generatePath(pageId: string, params?: Object): string {
+export function generatePath(pageId: string, params?: {}): string {
   if (!params) {
     params = {};
   }
-  params = {...params}
+  params = { ...params };
 
   const [generatePath, tokens] = parsePath(pageId);
   const path = generatePath(params);
-  const restParams: { [key: string]: any } = {...params};
-  tokens.forEach(t => {
-    if (typeof t === "object") {
-      delete restParams[t.name.toString()]
+  const restParams: { [key: string]: any } = { ...params };
+  tokens.forEach((t) => {
+    if (typeof t === 'object') {
+      delete restParams[t.name.toString()];
     }
   });
-  const result = path + "?" + qs.stringify(restParams as qs.ParsedUrlQueryInput)
-  return result.replace(/\?$/gmu, "")
+  const result = `${path}?${qs.stringify(restParams as qs.ParsedUrlQueryInput)}`;
+  return result.replace(/\?$/gmu, '');
 }
 
 /**
  * @ignore
  */
 export interface MatchInterface {
-  isExact: boolean
-  path: string
-  url: string
-  params: { [key: string]: string }
+  isExact: boolean;
+  path: string;
+  url: string;
+  params: { [key: string]: string };
 }
 
 /**
@@ -92,27 +93,29 @@ export interface MatchInterface {
  * @ignore
  */
 export function matchPath(location: string, pageId: string): null | MatchInterface {
-  const {regexp, keys} = convertPath(pageId, {
+  const { regexp, keys } = convertPath(pageId, {
     end: false,
     strict: false,
-    sensitive: false
+    sensitive: false,
   });
   let match = regexp.exec(location);
 
-  if (!match) return null;
+  if (!match) {
+    return null;
+  }
 
   const [url, ...values] = match;
   const isExact = location === url;
 
   return {
     path: pageId, // the path used to match
-    url: pageId === "/" && url === "" ? "/" : url, // the matched portion of the URL
+    url: pageId === '/' && url === '' ? '/' : url, // the matched portion of the URL
     isExact, // whether or not we matched exactly
-    params: keys.reduce((memo, key, index) => {
-      if (typeof key === "object") {
+    params: keys.reduce<{ [key: string]: string }>((memo, key, index) => {
+      if (typeof key === 'object') {
         memo[key.name] = values[index];
       }
       return memo;
-    }, {} as { [key: string]: string })
+    }, {}),
   };
 }

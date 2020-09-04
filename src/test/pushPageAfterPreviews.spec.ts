@@ -1,84 +1,82 @@
-import {dangerousResetGlobalRouterUseForTestOnly, Page, Router} from "..";
+import { dangerousResetGlobalRouterUseForTestOnly, Page, Router } from '..';
 
 function delay(time = 30) {
-  return new Promise(resolve => setTimeout(resolve, time))
+  return new Promise((resolve) => setTimeout(resolve, time));
 }
 
-describe("pushPageAfterPreviews", () => {
-
+describe('pushPageAfterPreviews', () => {
   beforeEach(() => {
-    dangerousResetGlobalRouterUseForTestOnly()
-  })
+    dangerousResetGlobalRouterUseForTestOnly();
+  });
 
-  it("simple", async (done) => {
+  it('simple', async (done) => {
     const r = new Router({
-      "/": new Page("main", "main"),
-      "/user": new Page("user", "main"),
-      "/info": new Page("info", "main"),
-      "/create": new Page("create", "create"),
-      "/done": new Page("done", "create"),
-    }, null)
+      '/': new Page('main', 'main'),
+      '/user': new Page('user', 'main'),
+      '/info': new Page('info', 'main'),
+      '/create': new Page('create', 'create'),
+      '/done': new Page('done', 'create'),
+    }, null);
 
-    r.start()
+    r.start();
 
-    r.pushPage("/user")
-    r.pushPage("/info")
-    r.pushPage("/create")
-    r.pushPage("/done")
-    await delay()
-    r.popPage()
-    await delay()
-    expect(r.getCurrentRouteOrDef().getPageId()).toBe("/create")
-    r.pushPageAfterPreviews("/", "/done")
-    await delay()
-    expect(r.getCurrentRouteOrDef().getPageId()).toBe("/done")
-    r.popPage()
-    await delay()
-    expect(r.getCurrentRouteOrDef().getPageId()).toBe("/")
-    done()
-  })
+    r.pushPage('/user');
+    r.pushPage('/info');
+    r.pushPage('/create');
+    r.pushPage('/done');
+    await delay();
+    r.popPage();
+    await delay();
+    expect(r.getCurrentRouteOrDef().getPageId()).toBe('/create');
+    r.pushPageAfterPreviews('/', '/done');
+    await delay();
+    expect(r.getCurrentRouteOrDef().getPageId()).toBe('/done');
+    r.popPage();
+    await delay();
+    expect(r.getCurrentRouteOrDef().getPageId()).toBe('/');
+    done();
+  });
 
-  it("complex", async (done) => {
+  it('complex', async (done) => {
     const r = new Router({
-      "/": new Page("main", "main"),
-      "/user": new Page("user", "main"),
-      "/info": new Page("info", "main"),
-      "/create": new Page("create", "main"),
-      "/done": new Page("done", "main"),
-    }, null)
+      '/': new Page('main', 'main'),
+      '/user': new Page('user', 'main'),
+      '/info': new Page('info', 'main'),
+      '/create': new Page('create', 'main'),
+      '/done': new Page('done', 'main'),
+    }, null);
 
-    r.start()
+    r.start();
 
-    r.pushPage("/user")
-    r.pushPage("/info")
-    r.pushPage("/create")
-    r.pushPage("/done")
-    await delay()
-    expect(r.getCurrentRouteOrDef().getPageId()).toBe("/done")
+    r.pushPage('/user');
+    r.pushPage('/info');
+    r.pushPage('/create');
+    r.pushPage('/done');
+    await delay();
+    expect(r.getCurrentRouteOrDef().getPageId()).toBe('/done');
 
     const updateCallback = jest.fn();
-    r.on("update", updateCallback)
-    r.pushPageAfterPreviews("/", "/done")
-    await r.afterUpdate()
-    r.off("update", updateCallback)
-    expect(r.getCurrentRouteOrDef().getPageId()).toBe("/done")
-    expect(r.history.getLength()).toBe(2)
-    expect(updateCallback).toHaveBeenCalled()
+    r.on('update', updateCallback);
+    r.pushPageAfterPreviews('/', '/done');
+    await r.afterUpdate();
+    r.off('update', updateCallback);
+    expect(r.getCurrentRouteOrDef().getPageId()).toBe('/done');
+    expect(r.history.getLength()).toBe(2);
+    expect(updateCallback).toHaveBeenCalled();
 
-    r.pushPageAfterPreviews("/info", "/create") //Тут страницы /info у нас нет, это обычный push
-    await r.afterUpdate()
-    expect(r.getCurrentRouteOrDef().getPageId()).toBe("/create")
-    expect(r.history.getLength()).toBe(3)
+    r.pushPageAfterPreviews('/info', '/create'); // Тут страницы /info у нас нет, это обычный push
+    await r.afterUpdate();
+    expect(r.getCurrentRouteOrDef().getPageId()).toBe('/create');
+    expect(r.history.getLength()).toBe(3);
 
-    r.popPage()
-    await r.afterUpdate()
-    expect(r.getCurrentRouteOrDef().getPageId()).toBe("/done")
+    r.popPage();
+    await r.afterUpdate();
+    expect(r.getCurrentRouteOrDef().getPageId()).toBe('/done');
 
-    r.popPage()
-    await r.afterUpdate()
-    expect(r.getCurrentRouteOrDef().getPageId()).toBe("/")
+    r.popPage();
+    await r.afterUpdate();
+    expect(r.getCurrentRouteOrDef().getPageId()).toBe('/');
 
-    done()
-  })
-
-})
+    done();
+  });
+});
