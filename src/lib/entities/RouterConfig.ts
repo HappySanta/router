@@ -3,7 +3,6 @@ export interface RouterConfig {
    * Добавить вывод логов для отладки переходов
    */
   enableLogging?: boolean;
-  enableErrorThrowing?: boolean;
   defaultPage?: string;
   defaultView?: string;
   defaultPanel?: string;
