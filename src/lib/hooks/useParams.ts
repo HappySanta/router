@@ -1,5 +1,5 @@
-import {PageParams, useLocation} from '../..';
-import {useRef} from 'react';
+import { PageParams, useLocation } from '../..';
+import { useRef } from 'react';
 
 /**
  * Возвращает {@link PageParams} текущего {@link Location}

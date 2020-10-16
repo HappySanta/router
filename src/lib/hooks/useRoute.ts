@@ -3,7 +3,7 @@
  * @packageDocumentation
  */
 
-import {Route, useLocation} from '../..';
+import { Route, useLocation } from '../..';
 
 /**
  * @param withUpdate

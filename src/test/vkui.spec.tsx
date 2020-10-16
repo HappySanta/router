@@ -192,7 +192,7 @@ test('VKUI integration stress test', async (done) => {
   await expectPanel(PANEL_MAIN);
 
   await delay();
-  await cleanup();
+  cleanup();
 
   done();
 });
