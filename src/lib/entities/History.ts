@@ -105,6 +105,11 @@ export class History {
     return this.stack[this.currentIndex] ? this.stack[this.currentIndex][1] : undefined;
   }
 
+  getHistoryItem(offset = 0): [Route, State] | undefined {
+    const index = this.currentIndex + offset;
+    return this.stack[index] ? this.stack[index] : undefined;
+  }
+
   canJumpIntoOffset(offset: number) {
     const index = this.currentIndex + offset;
     return index >= 0 && index <= this.getLength() - 1;

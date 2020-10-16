@@ -1,5 +1,5 @@
-import { useContext, useEffect, useRef, useState } from 'react';
-import { Location, PageParams, Router, RouterContext } from '../..';
+import { useContext, useEffect, useState } from 'react';
+import { Router, RouterContext } from '../..';
 
 const useForceUpdate = () => useState<number>(0)[1];
 
@@ -21,19 +21,4 @@ export function useRouter(withUpdate = false): Router {
     };
   }, []);
   return router;
-}
-
-export function useParams(): PageParams {
-  const router = useRouter(false);
-  const params = useRef(router.getCurrentLocation().getParams());
-  return params.current;
-}
-
-export function useLocation(withUpdate = true): Location {
-  const router = useRouter(withUpdate);
-  const cachedLocation = useRef(router.getCurrentLocation());
-  if (withUpdate) {
-    return router.getCurrentLocation();
-  }
-  return cachedLocation.current;
 }

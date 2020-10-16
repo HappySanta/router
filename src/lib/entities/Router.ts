@@ -33,7 +33,6 @@ export class Router extends EventEmitter<{
   routes: RouteList = {};
   history: History;
   enableLogging = false;
-  enableErrorThrowing = false;
   defaultPage: string = PAGE_MAIN;
   defaultView: string = VIEW_MAIN;
   defaultPanel: string = PANEL_MAIN;
@@ -67,9 +66,6 @@ export class Router extends EventEmitter<{
     if (routerConfig) {
       if (routerConfig.enableLogging !== undefined) {
         this.enableLogging = routerConfig.enableLogging;
-      }
-      if (routerConfig.enableErrorThrowing !== undefined) {
-        this.enableErrorThrowing = routerConfig.enableErrorThrowing;
       }
       if (routerConfig.defaultPage !== undefined) {
         this.defaultPage = routerConfig.defaultPage;
@@ -139,10 +135,6 @@ export class Router extends EventEmitter<{
     return stateFromLocation(this.history.getCurrentIndex());
   }
 
-  isErrorThrowingEnabled() {
-    return this.enableErrorThrowing;
-  }
-
   log(...args: any) {
     if (!this.enableLogging) {
       return;
@@ -157,7 +149,7 @@ export class Router extends EventEmitter<{
    */
   pushPage(pageId: string, params: PageParams = {}) {
     this.log(`pushPage ${pageId}`, params);
-    this.checkParams(params);
+    Router.checkParams(params);
     let currentRoute = this.getCurrentRouteOrDef();
     let nextRoute = MyRoute.fromPageId(this.routes, pageId, params);
     const s = { ...this.getCurrentStateOrDef() };
@@ -260,7 +252,7 @@ export class Router extends EventEmitter<{
    * @param params Будьте аккуратны с параметрами, не допускайте чтобы ваши параметры пересекались с параметрами страницы
    */
   pushModal(modalId: string, params: PageParams = {}) {
-    this.checkParams(params);
+    Router.checkParams(params);
     this.log(`pushModal ${modalId}`, params);
     let currentRoute = this.getCurrentRouteOrDef();
     const nextRoute = currentRoute.clone().setModalId(modalId).setParams(params);
@@ -272,7 +264,7 @@ export class Router extends EventEmitter<{
    * @param params Будьте аккуратны с параметрами, не допускайте чтобы ваши параметры пересекались с параметрами страницы
    */
   pushPopup(popupId: string, params: PageParams = {}) {
-    this.checkParams(params);
+    Router.checkParams(params);
     this.log(`pushPopup ${popupId}`, params);
     let currentRoute = this.getCurrentRouteOrDef();
     const nextRoute = currentRoute.clone().setPopupId(popupId).setParams(params);
@@ -380,14 +372,43 @@ export class Router extends EventEmitter<{
     return new Location(this.getCurrentRouteOrDef(), this.getCurrentStateOrDef());
   }
 
-  private checkParams(params: PageParams) {
+  getPreviousLocation(): Location|undefined {
+    const history = this.history.getHistoryItem(-1);
+    if (history) {
+      const [route, state] = history;
+      return new Location(route, { ...state });
+    }
+    return undefined;
+  }
+
+  /**
+   * @param safety - true будет ждать события не дольше 700мс, если вы уверены что надо ждать дольше передайте false
+   */
+  afterUpdate(safety = true): Promise<void> {
+    return new Promise((resolve) => {
+      let t = 0;
+      const fn = () => {
+        clearTimeout(t);
+        this.off('update', fn);
+        resolve();
+      };
+      this.on('update', fn);
+      if (safety) {
+        // На случай когда метод ошибочно используется не после popPage
+        // чтобы не завис навечно
+        t = setTimeout(fn, 700) as any as number;
+      }
+    });
+  }
+
+  private static checkParams(params: PageParams) {
     if (params.hasOwnProperty(POPUP_KEY)) {
-      if (this.isErrorThrowingEnabled()) {
+      if (Router.isErrorThrowingEnabled()) {
         throw new Error(`pushPage with key [${POPUP_KEY}]:${params[POPUP_KEY]} is not allowed use another key`);
       }
     }
     if (params.hasOwnProperty(MODAL_KEY)) {
-      if (this.isErrorThrowingEnabled()) {
+      if (Router.isErrorThrowingEnabled()) {
         throw new Error(`pushPage with key [${MODAL_KEY}]:${params[MODAL_KEY]} is not allowed use another key`);
       }
     }
@@ -490,23 +511,7 @@ export class Router extends EventEmitter<{
     }
   }
 
-  /**
-   * @param safety - true будет ждать события не дольше 700мс, если вы уверены что надо ждать дольше передайте false
-   */
-  afterUpdate(safety = true): Promise<void> {
-    return new Promise((resolve) => {
-      let t = 0;
-      const fn = () => {
-        clearTimeout(t);
-        this.off('update', fn);
-        resolve();
-      };
-      this.on('update', fn);
-      if (safety) {
-        // На случай когда метод ошибочно используется не после popPage
-        // чтобы не завис навечно
-        t = setTimeout(fn, 700) as any as number;
-      }
-    });
+  private static isErrorThrowingEnabled() {
+    return process.env.NODE_ENV !== 'production';
   }
 }
