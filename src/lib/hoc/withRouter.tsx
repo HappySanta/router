@@ -1,5 +1,5 @@
 import React, { ComponentType } from 'react';
-import { Location, PageParams, Route, Router, State, useParams, useRouter } from '../..';
+import { Location, PageParams, Route, Router, State, useRouter } from '../..';
 import { getDisplayName } from '../tools';
 
 export interface RouterProps {
@@ -57,24 +57,8 @@ export function withRouter<T>(Component: ComponentType<RouterProps & T>, withUpd
       routeState={router.getCurrentStateOrDef()}
       route={router.getCurrentRouteOrDef()} />;
   }
+
   WithRouter.displayName = `WithRouter(${getDisplayName(Component)})`;
   return WithRouter;
 }
 
-/**
- * HOC для добавления
- * params:{@link PageParams}
- * в компонент
- *
- * параметры не обновляются при переходах по страницам
- *
- * @param Component
- */
-export function withParams<T>(Component: ComponentType<RouterParams & T>): ComponentType<T> {
-  function WithParams(props: T) {
-    const params = useParams();
-    return <Component {...props} params={params} />;
-  }
-  WithParams.displayName = `WithParams(${getDisplayName(Component)})`;
-  return WithParams;
-}

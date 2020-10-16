@@ -1,6 +1,6 @@
 import { generatePath, matchPath } from './workWithPathRegexp';
 
-describe("matchPath", () => {
+describe('matchPath', () => {
   test('/ and /', () => {
     expect(!!matchPath('/', '/')).toBe(true);
   });

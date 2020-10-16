@@ -3,28 +3,15 @@
  * @packageDocumentation
  */
 
-import { useEffect, useState } from 'react';
-import { Route } from '../..';
-import { useRouter } from './useRouter';
+import {Route, useLocation} from '../..';
 
 /**
  * @param withUpdate
+ * @param panelId
  * @deprecated useRouter
  * @ignore
  */
-export function useRoute(withUpdate = true): Route {
-  const router = useRouter(false);
-  const [route, setRoute] = useState(router.getCurrentRouteOrDef());
-  useEffect(() => {
-    const fn = (next: Route) => {
-      if (withUpdate) {
-        setRoute(next);
-      }
-    };
-    router.on('update', fn);
-    return () => {
-      router.off('update', fn);
-    };
-  }, []);
-  return route;
+export function useRoute(withUpdate = true, panelId?: string): Route {
+  const location = useLocation(withUpdate, panelId);
+  return location.route;
 }

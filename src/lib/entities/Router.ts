@@ -372,6 +372,15 @@ export class Router extends EventEmitter<{
     return new Location(this.getCurrentRouteOrDef(), this.getCurrentStateOrDef());
   }
 
+  getPreviousLocation(): Location|undefined {
+    const history = this.history.getHistoryItem(-1);
+    if (history) {
+      const [route, state] = history;
+      return new Location(route, { ...state });
+    }
+    return undefined;
+  }
+
   /**
    * @param safety - true будет ждать события не дольше 700мс, если вы уверены что надо ждать дольше передайте false
    */
