@@ -48,7 +48,7 @@ export class Location {
     if (route.getViewId() === viewId) {
       return state.history;
     } else {
-      const lastPanelId = this.getPanelIdInView(viewId);
+      const lastPanelId = this.getViewActivePanel(viewId);
       if (lastPanelId) {
         return [lastPanelId];
       }

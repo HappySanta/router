@@ -40,6 +40,7 @@ export class Router extends EventEmitter<{
   private deferOnGoBack: (() => void) | null = null;
   private startHistoryOffset = 0;
   private started = false;
+  private readonly infinityPanelCacheInstance: Map<string, string[]> = new Map<string, string[]>();
 
   /**
    *
@@ -98,7 +99,7 @@ export class Router extends EventEmitter<{
     }
     this.started = true;
 
-    let enterEvent: [MyRoute, MyRoute|undefined]|null = null;
+    let enterEvent: [MyRoute, MyRoute | undefined] | null = null;
     this.startHistoryOffset = window.history.length;
     let nextRoute = this.createRouteFromLocationWithReplace();
     const state = stateFromLocation(this.history.getCurrentIndex());
@@ -116,6 +117,7 @@ export class Router extends EventEmitter<{
   }
 
   stop() {
+    this.started = false;
     window.removeEventListener('popstate', this.onPopState);
   }
 
@@ -372,7 +374,7 @@ export class Router extends EventEmitter<{
     return new Location(this.getCurrentRouteOrDef(), this.getCurrentStateOrDef());
   }
 
-  getPreviousLocation(): Location|undefined {
+  getPreviousLocation(): Location | undefined {
     const history = this.history.getHistoryItem(-1);
     if (history) {
       const [route, state] = history;
@@ -513,5 +515,25 @@ export class Router extends EventEmitter<{
 
   private static isErrorThrowingEnabled() {
     return process.env.NODE_ENV !== 'production';
+  }
+
+  /**
+   * Чтобы отрендерить бесконечне панели надо знать их id
+   * этот метод возвращает все id панелей которые хоть раз были отрендерены
+   * это не эффективно, однако сейчас точно нельзя сказать когда панель нужна а когда нет
+   * это обусловленно тем что панели надо убирать из дерева только после того как пройдет анимация vkui
+   * кроме того панели могут убираться из середины, благодоря useThrottlingLocation.ts
+   *
+   * текущее решение -- рендерить все панели всегда
+   *
+   * @param viewId
+   */
+  public getInfinityPanelList(viewId: string): string[] {
+    const list = this.getCurrentLocation().getViewHistoryWithLastPanel(viewId);
+    const oldList = this.infinityPanelCacheInstance.get(viewId) || [];
+    const mergedList = Array.from(new Set(list.concat(oldList)));
+    mergedList.sort((a, b) => a.localeCompare(b));
+    this.infinityPanelCacheInstance.set(viewId, mergedList);
+    return mergedList;
   }
 }
