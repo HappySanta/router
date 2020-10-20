@@ -532,7 +532,11 @@ export class Router extends EventEmitter<{
     const list = this.getCurrentLocation().getViewHistoryWithLastPanel(viewId);
     const oldList = this.infinityPanelCacheInstance.get(viewId) || [];
     const mergedList = Array.from(new Set(list.concat(oldList)));
-    mergedList.sort((a, b) => a.localeCompare(b));
+    mergedList.sort((a, b) => {
+      const [, xa] = a.split('..');
+      const [, xb] = b.split('..');
+      return Number(xa) - Number(xb);
+    });
     this.infinityPanelCacheInstance.set(viewId, mergedList);
     return mergedList;
   }
