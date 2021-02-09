@@ -26,6 +26,8 @@ export declare type EnterEventFn = (newRoute: MyRoute, oldRoute?: MyRoute) => vo
  */
 export declare type LeaveEventFn = (newRoute: MyRoute, oldRoute: MyRoute, isNewRoute: boolean, type: HistoryUpdateType) => void;
 
+export declare type RouterMiddleware = (route: MyRoute, hash: string) => MyRoute;
+
 export class Router extends EventEmitter<{
   update: UpdateEventFn;
   enter: EnterEventFn;
@@ -37,10 +39,16 @@ export class Router extends EventEmitter<{
   defaultView: string = VIEW_MAIN;
   defaultPanel: string = PANEL_MAIN;
   alwaysStartWithSlash = true;
+  blankMiddleware: RouterMiddleware[] = [];
   private deferOnGoBack: (() => void) | null = null;
   private startHistoryOffset = 0;
   private started = false;
   private readonly infinityPanelCacheInstance: Map<string, string[]> = new Map<string, string[]>();
+  private readonly performBlankMiddleware = (route: MyRoute, hash: string) => {
+    return this.blankMiddleware.reduce((route, middleware) => {
+      return middleware(route, hash);
+    }, route);
+  };
 
   /**
    *
@@ -80,6 +88,9 @@ export class Router extends EventEmitter<{
       if (routerConfig.noSlash !== undefined) {
         this.alwaysStartWithSlash = routerConfig.noSlash;
       }
+      if (routerConfig.blankMiddleware !== undefined) {
+        this.blankMiddleware = routerConfig.blankMiddleware;
+      }
     }
   }
 
@@ -105,6 +116,7 @@ export class Router extends EventEmitter<{
     const state = stateFromLocation(this.history.getCurrentIndex());
     state.first = 1;
     if (state.blank === 1) {
+      nextRoute = this.performBlankMiddleware(nextRoute, window.location.hash);
       enterEvent = [nextRoute, this.history.getCurrentRoute()];
       state.history = [nextRoute.getPanelId()];
     }
@@ -439,6 +451,7 @@ export class Router extends EventEmitter<{
     if (state.blank === 1) {
       // Пустое состояние бывает когда приложение восстанавливают из кеша с другим хешом
       // такое состояние помечаем как первая страница
+      nextRoute = this.performBlankMiddleware(nextRoute, window.location.hash);
       state.first = 1;
       state.index = this.history.getCurrentIndex();
       state.history = [nextRoute.getPanelId()];
