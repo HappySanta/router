@@ -45,14 +45,10 @@ export class Router extends EventEmitter<{
   private started = false;
   private readonly infinityPanelCacheInstance: Map<string, string[]> = new Map<string, string[]>();
   private readonly performBlankMiddleware = (route: MyRoute, hash: string) => {
-    const state = stateFromLocation(this.history.getCurrentIndex());
-    if (state.blank === 1) {
-      return this.blankMiddleware.reduce((route, middleware) => {
-        return middleware(route, hash);
-      }, route);
-    }
-    return route;
-  }
+    return this.blankMiddleware.reduce((route, middleware) => {
+      return middleware(route, hash);
+    }, route);
+  };
 
   /**
    *
@@ -120,6 +116,7 @@ export class Router extends EventEmitter<{
     const state = stateFromLocation(this.history.getCurrentIndex());
     state.first = 1;
     if (state.blank === 1) {
+      nextRoute = this.performBlankMiddleware(nextRoute, window.location.hash);
       enterEvent = [nextRoute, this.history.getCurrentRoute()];
       state.history = [nextRoute.getPanelId()];
     }
@@ -454,6 +451,7 @@ export class Router extends EventEmitter<{
     if (state.blank === 1) {
       // Пустое состояние бывает когда приложение восстанавливают из кеша с другим хешом
       // такое состояние помечаем как первая страница
+      nextRoute = this.performBlankMiddleware(nextRoute, window.location.hash);
       state.first = 1;
       state.index = this.history.getCurrentIndex();
       state.history = [nextRoute.getPanelId()];
@@ -507,12 +505,11 @@ export class Router extends EventEmitter<{
   private createRouteFromLocationWithReplace() {
     const location = window.location.hash;
     try {
-      const route = MyRoute.fromLocation(this.routes, location, this.alwaysStartWithSlash);
-      return this.performBlankMiddleware(route, location);
+      return MyRoute.fromLocation(this.routes, location, this.alwaysStartWithSlash);
     } catch (e) {
       if (e && e.message === 'ROUTE_NOT_FOUND') {
         const def = this.getDefaultRoute(location, MyRoute.getParamsFromPath(location));
-        return this.replacerUnknownRoute(this.performBlankMiddleware(def, location), this.history.getCurrentRoute());
+        return this.replacerUnknownRoute(def, this.history.getCurrentRoute());
       }
       throw e;
     }
