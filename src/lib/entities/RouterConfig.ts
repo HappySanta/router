@@ -1,3 +1,5 @@
+import {RouterMiddleware} from "./Router";
+
 export interface RouterConfig {
   /**
    * Добавить вывод логов для отладки переходов
@@ -10,4 +12,5 @@ export interface RouterConfig {
    * всегда используйте `true` чтобы избежать путаницы с адресами vk.com/app123#product/123 и vk.com/app123#/product/123
    */
   noSlash?: boolean;
+  blankMiddleware?: RouterMiddleware[]
 }

@@ -26,6 +26,8 @@ export declare type EnterEventFn = (newRoute: MyRoute, oldRoute?: MyRoute) => vo
  */
 export declare type LeaveEventFn = (newRoute: MyRoute, oldRoute: MyRoute, isNewRoute: boolean, type: HistoryUpdateType) => void;
 
+export declare type RouterMiddleware = (route: MyRoute, hash: string) => MyRoute;
+
 export class Router extends EventEmitter<{
   update: UpdateEventFn;
   enter: EnterEventFn;
@@ -37,10 +39,20 @@ export class Router extends EventEmitter<{
   defaultView: string = VIEW_MAIN;
   defaultPanel: string = PANEL_MAIN;
   alwaysStartWithSlash = true;
+  blankMiddleware: RouterMiddleware[] = [];
   private deferOnGoBack: (() => void) | null = null;
   private startHistoryOffset = 0;
   private started = false;
   private readonly infinityPanelCacheInstance: Map<string, string[]> = new Map<string, string[]>();
+  private readonly performBlankMiddleware = (route: MyRoute, hash: string) => {
+    const state = stateFromLocation(this.history.getCurrentIndex());
+    if (state.blank === 1) {
+      return this.blankMiddleware.reduce((route, middleware) => {
+        return middleware(route, hash);
+      }, route);
+    }
+    return route;
+  }
 
   /**
    *
@@ -79,6 +91,9 @@ export class Router extends EventEmitter<{
       }
       if (routerConfig.noSlash !== undefined) {
         this.alwaysStartWithSlash = routerConfig.noSlash;
+      }
+      if (routerConfig.blankMiddleware !== undefined) {
+        this.blankMiddleware = routerConfig.blankMiddleware;
       }
     }
   }
@@ -492,11 +507,12 @@ export class Router extends EventEmitter<{
   private createRouteFromLocationWithReplace() {
     const location = window.location.hash;
     try {
-      return MyRoute.fromLocation(this.routes, location, this.alwaysStartWithSlash);
+      const route = MyRoute.fromLocation(this.routes, location, this.alwaysStartWithSlash);
+      return this.performBlankMiddleware(route, location);
     } catch (e) {
       if (e && e.message === 'ROUTE_NOT_FOUND') {
         const def = this.getDefaultRoute(location, MyRoute.getParamsFromPath(location));
-        return this.replacerUnknownRoute(def, this.history.getCurrentRoute());
+        return this.replacerUnknownRoute(this.performBlankMiddleware(def, location), this.history.getCurrentRoute());
       }
       throw e;
     }
