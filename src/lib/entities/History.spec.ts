@@ -2,6 +2,7 @@ import { History } from './History';
 import { Route } from './Route';
 import { State, stateFromLocation } from './State';
 import { Page } from './Page';
+import { cleanup } from '@testing-library/react';
 
 function getRoute() {
   return new Route(new Page('main', 'main'), '/', {});
@@ -12,6 +13,11 @@ function getState(): State {
 }
 
 describe('History', () => {
+  afterEach(() => {
+    cleanup();
+    window.history.replaceState({}, '', '/#');
+  });
+
   it('check', () => {
     const h = new History();
 
