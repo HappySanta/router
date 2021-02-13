@@ -4,6 +4,7 @@ import { delay } from './tools';
 describe('popPageTo', () => {
   beforeEach(() => {
     dangerousResetGlobalRouterUseForTestOnly();
+    window.history.replaceState({}, '', '/#');
   });
 
   it('move to expected', async (done) => {

@@ -13,10 +13,15 @@ import React from 'react';
 import Root from '@vkontakte/vkui/dist/components/Root/Root';
 import View from '@vkontakte/vkui/dist/components/View/View';
 import Panel from '@vkontakte/vkui/dist/components/Panel/Panel';
-import { act, render } from '@testing-library/react';
+import { act, cleanup, render } from '@testing-library/react';
 import ConfigProvider from '@vkontakte/vkui/dist/components/ConfigProvider/ConfigProvider';
 
 describe('dynamic panels', () => {
+  afterEach(() => {
+    cleanup();
+    window.history.replaceState({}, '', '/#');
+  });
+
   test('work with fast back press', async (done) => {
     // scrollTo is not implemented
     Object.defineProperty(global.window, 'scrollTo', { value: noop });

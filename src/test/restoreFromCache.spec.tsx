@@ -2,6 +2,10 @@ import { Page, Router } from '..';
 import { delay } from './tools';
 
 describe('restoreFromCache', () => {
+  beforeEach(() => {
+    window.history.replaceState({}, '', '/#');
+  });
+
   it('firstPageCHeckWorked', async (done) => {
     const USER_PAGE = '/user/:id([0-9]+)';
     const r = new Router({

@@ -7,6 +7,7 @@ function delay(time = 30) {
 describe('pushPageAfterPreviews', () => {
   beforeEach(() => {
     dangerousResetGlobalRouterUseForTestOnly();
+    window.history.replaceState({}, '', '/#');
   });
 
   it('simple', async (done) => {
