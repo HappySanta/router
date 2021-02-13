@@ -37,6 +37,10 @@ export class Router extends EventEmitter<{
   defaultView: string = VIEW_MAIN;
   defaultPanel: string = PANEL_MAIN;
   alwaysStartWithSlash = true;
+  /**
+   * Значение window.location.hash которое было на момент старта роутера
+   */
+  startHash = '';
   private deferOnGoBack: (() => void) | null = null;
   private startHistoryOffset = 0;
   private started = false;
@@ -98,7 +102,7 @@ export class Router extends EventEmitter<{
       throw new Error('start method call twice! this is not allowed');
     }
     this.started = true;
-
+    this.startHash = window.location.hash;
     let enterEvent: [MyRoute, MyRoute | undefined] | null = null;
     this.startHistoryOffset = window.history.length;
     let nextRoute = this.createRouteFromLocationWithReplace();

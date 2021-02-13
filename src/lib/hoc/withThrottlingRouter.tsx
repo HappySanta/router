@@ -11,17 +11,25 @@ export interface ThrottlingRouterProps extends RouterProps {
  * Смотри описание {@link useThrottlingLocation}
  * @param Component
  */
-export function withThrottlingRouter<T>(Component: ComponentType<ThrottlingRouterProps & T>): ComponentType<T> {
-  function WithThrottlingRouter(props: T) {
+export function withThrottlingRouter<T extends ThrottlingRouterProps>(Component: ComponentType<T>): ComponentType<Omit<T, keyof ThrottlingRouterProps>> {
+  function WithThrottlingRouter(props: Omit<T, keyof ThrottlingRouterProps>) {
     const router = useRouter(false);
     const [location, onTransitionEnd] = useThrottlingLocation();
-    return <Component {...props}
-      router={router}
-      onTransitionEnd={onTransitionEnd}
-      routeState={location.state}
-      location={location}
-      route={location.route} />;
+    const routerProps: ThrottlingRouterProps = {
+      router: router,
+      onTransitionEnd: onTransitionEnd,
+      routeState: location.state,
+      location: location,
+      route: location.route,
+    };
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    const allProps: T = {
+      ...props,
+      ...routerProps,
+    } as T;
+    return <Component {...allProps} />;
   }
+
   WithThrottlingRouter.displayName = `WithThrottlingRouter(${getDisplayName(Component)})`;
   return WithThrottlingRouter;
 }

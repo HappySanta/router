@@ -30,7 +30,7 @@ export type SantaRouterProps = RouterProps;
  * @deprecated use withRouter
  * @ignore
  */
-export function withSantaRouter<T>(Component: ComponentType<RouterProps & T>): ComponentType<T> {
+export function withSantaRouter<T extends RouterProps>(Component: ComponentType<T>) {
   return withRouter<T>(Component);
 }
 
@@ -48,14 +48,21 @@ export function withSantaRouter<T>(Component: ComponentType<RouterProps & T>): C
  * @param Component
  * @param withUpdate true - обновлять изменении при изменении location false - не обновлять
  */
-export function withRouter<T>(Component: ComponentType<RouterProps & T>, withUpdate = true): ComponentType<T> {
-  function WithRouter(props: T) {
+export function withRouter<T extends RouterProps>(Component: ComponentType<T>, withUpdate = true): ComponentType<Omit<T, keyof RouterProps>> {
+  function WithRouter(props: Omit<T, keyof RouterProps>) {
     const router = useRouter(withUpdate);
-    return <Component {...props}
-      router={router}
-      location={router.getCurrentLocation()}
-      routeState={router.getCurrentStateOrDef()}
-      route={router.getCurrentRouteOrDef()} />;
+    const routerProps: RouterProps = {
+      router: router,
+      location: router.getCurrentLocation(),
+      routeState: router.getCurrentStateOrDef(),
+      route: router.getCurrentRouteOrDef(),
+    };
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    const propsWithRouter: T = {
+      ...props,
+      ...routerProps,
+    } as T;
+    return <Component {...propsWithRouter} />;
   }
 
   WithRouter.displayName = `WithRouter(${getDisplayName(Component)})`;
