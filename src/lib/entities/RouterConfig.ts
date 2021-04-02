@@ -13,4 +13,5 @@ export interface RouterConfig {
    */
   noSlash?: boolean;
   blankMiddleware?: RouterMiddleware[];
+  preventSameLocationChange?: boolean;
 }
