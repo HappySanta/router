@@ -141,3 +141,26 @@ test('check history', async (done) => {
   r.stop();
   done();
 });
+
+test('route preventSameLocationChange', async (done) => {
+  dangerousResetGlobalRouterUseForTestOnly();
+  const r = new Router({
+    '/': new Page(),
+    '/user': new Page('user'),
+    '/info': new Page('info'),
+  }, { preventSameLocationChange: true });
+
+  r.start();
+  expect(r.history.getCurrentIndex()).toBe(0);
+  r.pushPage('/user');
+  expect(r.history.getCurrentIndex()).toBe(1);
+  await delay(10);
+
+  // Пушим точно такую же страницу, ничего не должно произойти
+  let wasUpdates = false;
+  r.once('update', () => wasUpdates = true);
+  r.pushPage('/user');
+  expect(r.history.getCurrentIndex()).toBe(1);
+  expect(wasUpdates).toBe(false);
+  done();
+});

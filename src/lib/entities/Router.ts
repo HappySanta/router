@@ -40,6 +40,7 @@ export class Router extends EventEmitter<{
   defaultPanel: string = PANEL_MAIN;
   alwaysStartWithSlash = true;
   blankMiddleware: RouterMiddleware[] = [];
+  preventSameLocationChange = false;
   /**
    * Значение window.location.hash которое было на момент старта роутера
    */
@@ -94,6 +95,9 @@ export class Router extends EventEmitter<{
       }
       if (routerConfig.blankMiddleware !== undefined) {
         this.blankMiddleware = routerConfig.blankMiddleware;
+      }
+      if (routerConfig.preventSameLocationChange !== undefined) {
+        this.preventSameLocationChange = routerConfig.preventSameLocationChange;
       }
     }
   }
@@ -484,6 +488,9 @@ export class Router extends EventEmitter<{
   };
 
   private replace(state: State, nextRoute: MyRoute) {
+    if (!state.blank && this.needPreventSameLocationChange(nextRoute)) {
+      return;
+    }
     state.length = window.history.length;
     state.index = this.history.getCurrentIndex();
     state.blank = 0;
@@ -495,6 +502,9 @@ export class Router extends EventEmitter<{
   }
 
   private push(state: State, nextRoute: MyRoute) {
+    if (this.needPreventSameLocationChange(nextRoute)) {
+      return;
+    }
     state.length = window.history.length;
     state.blank = 0;
     state.first = 0;
@@ -556,5 +566,13 @@ export class Router extends EventEmitter<{
     });
     this.infinityPanelCacheInstance.set(viewId, mergedList);
     return mergedList;
+  }
+
+  private static isSameLocation(currentRoute: MyRoute, nextRoute: MyRoute) {
+    return currentRoute.getLocation() === nextRoute.getLocation();
+  }
+
+  private needPreventSameLocationChange(nextRoute: MyRoute) {
+    return this.preventSameLocationChange && Router.isSameLocation(this.getCurrentRouteOrDef(), nextRoute);
   }
 }
