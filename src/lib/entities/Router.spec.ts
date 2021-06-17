@@ -164,3 +164,25 @@ test('route preventSameLocationChange', async (done) => {
   expect(wasUpdates).toBe(false);
   done();
 });
+
+test('fixBrokenHistory', async (done) => {
+  dangerousResetGlobalRouterUseForTestOnly();
+  const r = new Router({
+    '/': new Page(),
+    '/user': new Page('user'),
+    '/product': new Page('user'),
+  });
+  r.start();
+  r.pushPage('/user');
+  r.pushPage('/product');
+
+  // Эмитируем открытие м закрытие левого приложения
+  window.history.pushState(null, 'OTHER PAGE OPEN', '#PAGE OPEN');
+
+  r.fixBrokenHistory();
+  expect(r.getCurrentLocation().getPageId()).toBe('/product');
+  r.popPage();
+  await r.afterUpdate();
+  expect(r.getCurrentLocation().getPageId()).toBe('/user');
+  done();
+});

@@ -261,6 +261,15 @@ export class Router extends EventEmitter<{
   /**
    * Способ починить историю браузера когда ее сломали снаружи из фрейма
    * например перейдя по колокольчику или открыв вкпей
+   * проблема: миниап запущен фо фрейме и у него обшая исторя страниц с родительской страницей
+   * все происходит хорошо когда только миниап пушит в историю страницы
+   * [X1, X2, X3]
+   * когда приходит родительская страница и пуши что-то в историю
+   * [X1, X2, X3, Y1, Y1]
+   * то случается беда, в истории перремешаны страницы, следующий popPage приведет в неожиданное место
+   * в даннмо слусе ожидалось что popPage перейдет с X3 на X2, но фактически придут на Y1
+   * идея решения -- запушить снова все "нужные страницы поверх истории"
+   * [X1, X2, X3, Y1, Y1, X1, X2, X3]
    */
   fixBrokenHistory() {
     this.history.getHistoryFromStartToCurrent().forEach(([r, s]) => {
@@ -477,7 +486,12 @@ export class Router extends EventEmitter<{
       return;
     }
 
-    this.log('onPopState', [nextRoute, this.history.getCurrentRoute(), state]);
+    this.log('onPopState', {
+      to: updateEvent[0],
+      from: updateEvent[1],
+      is_new_route: updateEvent[2],
+      move_type: updateEvent[3],
+    });
 
     if (enterEvent) {
       this.emit('enter', ...enterEvent);

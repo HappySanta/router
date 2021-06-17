@@ -140,7 +140,7 @@ export class History {
   }
 
   getHistoryFromStartToCurrent(): Array<[Route, State]> {
-    return this.stack.slice(0, this.currentIndex);
+    return this.stack.slice(0, this.currentIndex + 1);
   }
 
   private readonly setLastPanelInView = (next: Route, prev?: Route) => {
