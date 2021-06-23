@@ -186,3 +186,22 @@ test('fixBrokenHistory', async (done) => {
   expect(r.getCurrentLocation().getPageId()).toBe('/user');
   done();
 });
+
+test('popPageToAndReplace', async (done) => {
+  dangerousResetGlobalRouterUseForTestOnly();
+  const r = new Router({
+    '/': new Page(),
+    '/user': new Page('user'),
+    '/product': new Page('user'),
+    '/done': new Page('done'),
+  });
+  r.start();
+  r.pushPage('/user');
+  r.pushPage('/product');
+
+  r.popPageToAndReplace(-2, '/done', {});
+  await r.afterUpdate();
+
+  expect(r.history.getCurrentIndex()).toBe(0);
+  await done();
+});

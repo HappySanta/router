@@ -222,7 +222,7 @@ export class Router extends EventEmitter<{
   }
 
   /**
-   * Если x - число, то осуществляется переход на указанное количество шагов назад
+   * Если x - число, то осуществляется переход на указанное количество шагов
    * Если x - строка, то в истории будет найдена страница с указанным pageId и осуществлен переход до нее
    * @param {string|number} x
    */
@@ -241,6 +241,7 @@ export class Router extends EventEmitter<{
   }
 
   popPageToAndPush(x: number, pageId: string, params: PageParams = {}) {
+    this.log('popPageToAndPush', x, pageId, params);
     if (x !== 0) {
       this.deferOnGoBack = () => {
         this.pushPage(pageId, params);
@@ -248,6 +249,18 @@ export class Router extends EventEmitter<{
       Router.backTo(x);
     } else {
       this.pushPage(pageId, params);
+    }
+  }
+
+  popPageToAndReplace(x: number, pageId: string, params: PageParams = {}) {
+    this.log('popPageToAndReplace', x, pageId, params);
+    if (x !== 0) {
+      this.deferOnGoBack = () => {
+        this.replacePage(pageId, params);
+      };
+      Router.backTo(x);
+    } else {
+      this.replacePage(pageId, params);
     }
   }
 
