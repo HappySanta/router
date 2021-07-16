@@ -5,7 +5,7 @@ import { preventBlinkingBySettingScrollRestoration } from '../tools';
 import { State, stateFromLocation } from './State';
 import { EventEmitter } from 'tsee';
 
-import { PAGE_MAIN, PANEL_MAIN, VIEW_MAIN } from '../const';
+import { PAGE_MAIN, PANEL_MAIN, ROOT_MAIN, VIEW_MAIN } from '../const';
 import { RouterConfig } from './RouterConfig';
 import { Location } from './Location';
 import { HistoryUpdateType, PageParams } from './Types';
@@ -37,6 +37,7 @@ export class Router extends EventEmitter<{
   enableLogging = false;
   defaultPage: string = PAGE_MAIN;
   defaultView: string = VIEW_MAIN;
+  defaultRoot: string = ROOT_MAIN;
   defaultPanel: string = PANEL_MAIN;
   alwaysStartWithSlash = true;
   blankMiddleware: RouterMiddleware[] = [];
@@ -464,7 +465,7 @@ export class Router extends EventEmitter<{
     } catch (e) {
       if (e && e.message === 'ROUTE_NOT_FOUND') {
         return new MyRoute(
-          new Page(this.defaultPanel, this.defaultView),
+          new Page(this.defaultPanel, this.defaultView, this.defaultRoot),
           this.defaultPage,
           params,
         );

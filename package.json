@@ -50,6 +50,7 @@
     "@typescript-eslint/eslint-plugin": "^2.34.0",
     "@typescript-eslint/parser": "^2.34.0",
     "@vkontakte/eslint-config": "^2.5.0",
+    "@vkontakte/icons": "^1.112.0",
     "@vkontakte/vk-bridge": "^2.2.8",
     "@vkontakte/vkui": "^4.0.0-beta.27",
     "babel-eslint": "^10.1.0",

@@ -115,6 +115,10 @@ export class Route {
     return this.structure.viewId;
   }
 
+  getRootId() {
+    return this.structure.rootId;
+  }
+
   getParams(): PageParams {
     return this.params;
   }

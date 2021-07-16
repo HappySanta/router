@@ -1,11 +1,12 @@
 import React from 'react';
-import { Page, RouteList, Router, RouterContext, Location, useLocation } from '..';
+import { Page, RouteList, Router, RouterContext, Location, useLocation, ROOT_MAIN } from '..';
 import { act, render, cleanup } from '@testing-library/react';
 import { noop, delay } from './tools';
 import ConfigProvider from '@vkontakte/vkui/dist/components/ConfigProvider/ConfigProvider';
 import Root from '@vkontakte/vkui/dist/components/Root/Root';
 import View from '@vkontakte/vkui/dist/components/View/View';
 import Panel from '@vkontakte/vkui/dist/components/Panel/Panel';
+import { Epic, Tabbar } from '@vkontakte/vkui';
 
 describe('VKUI', () => {
   beforeEach(() => {
@@ -197,6 +198,81 @@ describe('VKUI', () => {
     await expectPanel(PANEL_MAIN);
 
     await delay();
+    cleanup();
+
+    done();
+  });
+
+  test('VKUI Epic', async (done) => {
+    // scrollTo is not implemented
+    Object.defineProperty(global.window, 'scrollTo', { value: noop });
+
+    const PAGE_MAIN = '/';
+    const PAGE_ABOUT = '/about';
+    const PAGE_ABOUT_NEXT = '/about/next';
+
+    const PANEL_MAIN = 'panel_main';
+    const PANEL_ABOUT = 'panel_about';
+    const PANEL_ABOUT_NEXT = 'panel_about_next';
+
+    const VIEW_MAIN = 'view_main';
+    const VIEW_ABOUT = 'view_about';
+
+    const ROOT_ABOUT = 'root_about';
+
+    const list: RouteList = {
+      [PAGE_MAIN]: new Page(PANEL_MAIN, VIEW_MAIN),
+      [PAGE_ABOUT]: new Page(PANEL_ABOUT, VIEW_ABOUT, ROOT_ABOUT),
+      [PAGE_ABOUT_NEXT]: new Page(PANEL_ABOUT_NEXT, VIEW_ABOUT, ROOT_ABOUT),
+    };
+
+    const Main: React.FC = () => {
+      const location = useLocation(true);
+
+      return (
+        <Epic tabbar={<Tabbar />} activeStory={location.getRootId()}>
+          <Root id={ROOT_MAIN} activeView={location.getViewId()}>
+            <View {...getViewProps(VIEW_MAIN, location)}>
+              <Panel id={PANEL_MAIN} data-testid={PANEL_MAIN}>{PANEL_MAIN}</Panel>
+            </View>
+          </Root>
+          <Root id={ROOT_ABOUT} activeView={location.getViewId()}>
+            <View {...getViewProps(VIEW_ABOUT, location)}>
+              <Panel id={PANEL_ABOUT} data-testid={PANEL_ABOUT}>{PANEL_ABOUT}</Panel>
+              <Panel id={PANEL_ABOUT_NEXT} data-testid={PANEL_ABOUT_NEXT}>{PANEL_ABOUT_NEXT}</Panel>
+            </View>
+          </Root>
+        </Epic>
+      );
+    };
+
+    const router = new Router(list);
+    router.start();
+
+    const component = render(
+      <ConfigProvider transitionMotionEnabled={false}>
+        <RouterContext.Provider value={router}>
+          <Main />
+        </RouterContext.Provider>,
+      </ConfigProvider>,
+    );
+
+    const expectPanel = async (panel: string) => {
+      expect(await component.findByTestId(panel)).toBeTruthy();
+    };
+
+    await expectPanel(PANEL_MAIN);
+
+    act(() => {
+      router.pushPage(PAGE_ABOUT);
+    });
+    await expectPanel(PANEL_ABOUT);
+
+    act(() => {
+      router.pushPage(PAGE_ABOUT_NEXT);
+    });
+    await expectPanel(PANEL_ABOUT_NEXT);
+
     cleanup();
 
     done();

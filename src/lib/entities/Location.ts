@@ -92,6 +92,10 @@ export class Location {
     return this.route.getViewId();
   }
 
+  public getRootId() {
+    return this.route.getRootId();
+  }
+
   public getModalId() {
     return this.route.getModalId();
   }
