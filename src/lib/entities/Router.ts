@@ -608,7 +608,6 @@ export class Router extends EventEmitter<{
   }
 
   public onVKWebAppChangeFragment(location: string) {
-    const route = this.createRouteFromLocationWithReplace(location);
-    this.replacePage(route.pageId, route.params);
+    window.location.hash = location.startsWith('#') ? location : `#${location}`;
   }
 }
