@@ -121,7 +121,7 @@ export class Router extends EventEmitter<{
     this.startHash = window.location.hash;
     let enterEvent: [MyRoute, MyRoute | undefined] | null = null;
     this.startHistoryOffset = window.history.length;
-    let nextRoute = this.createRouteFromLocationWithReplace();
+    let nextRoute = this.createRouteFromLocationWithReplace(window.location.hash);
     const state = stateFromLocation(this.history.getCurrentIndex());
     state.first = 1;
     if (state.blank === 1) {
@@ -475,7 +475,7 @@ export class Router extends EventEmitter<{
   }
 
   private readonly onPopState = () => {
-    let nextRoute = this.createRouteFromLocationWithReplace();
+    let nextRoute = this.createRouteFromLocationWithReplace(window.location.hash);
     const state = stateFromLocation(this.history.getCurrentIndex());
     let enterEvent: [MyRoute, MyRoute | undefined] | null = null;
     let updateEvent: UpdateEventType | null = null;
@@ -544,8 +544,11 @@ export class Router extends EventEmitter<{
     this.emit('update', ...updateEvent);
   }
 
-  private createRouteFromLocationWithReplace() {
-    const location = window.location.hash;
+  /**
+   * @param location значение window.location.hash
+   * @private
+   */
+  public createRouteFromLocationWithReplace(location: string): MyRoute {
     try {
       return MyRoute.fromLocation(this.routes, location, this.alwaysStartWithSlash);
     } catch (e) {
@@ -602,5 +605,10 @@ export class Router extends EventEmitter<{
 
   private needPreventSameLocationChange(nextRoute: MyRoute) {
     return this.preventSameLocationChange && Router.isSameLocation(this.getCurrentRouteOrDef(), nextRoute);
+  }
+
+  public onVKWebAppChangeFragment(location: string) {
+    const route = this.createRouteFromLocationWithReplace(location);
+    this.replacePage(route.pageId, route.params);
   }
 }
