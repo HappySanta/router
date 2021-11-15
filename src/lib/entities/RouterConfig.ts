@@ -1,4 +1,5 @@
 import { RouterMiddleware } from './Router';
+import { UsedFixers } from './HotFixers';
 
 export interface RouterConfig {
   /**
@@ -14,4 +15,6 @@ export interface RouterConfig {
   noSlash?: boolean;
   blankMiddleware?: RouterMiddleware[];
   preventSameLocationChange?: boolean;
+
+  hotFixes?: UsedFixers;
 }

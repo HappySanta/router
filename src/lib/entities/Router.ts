@@ -9,6 +9,7 @@ import { PAGE_MAIN, PANEL_MAIN, ROOT_MAIN, VIEW_MAIN } from '../const';
 import { RouterConfig } from './RouterConfig';
 import { Location } from './Location';
 import { HistoryUpdateType, PageParams } from './Types';
+import { Fixer, USE_ALL_FIXES, USE_DESKTOP_SAFARI_BACK_BUG } from './HotFixers';
 
 export declare type RouteList = { [key: string]: Page };
 
@@ -42,6 +43,7 @@ export class Router extends EventEmitter<{
   alwaysStartWithSlash = true;
   blankMiddleware: RouterMiddleware[] = [];
   preventSameLocationChange = false;
+  hotFixes: Set<Fixer>;
   /**
    * Значение window.location.hash которое было на момент старта роутера
    */
@@ -78,6 +80,7 @@ export class Router extends EventEmitter<{
     super();
     this.routes = routes;
     this.history = new History();
+    this.hotFixes = new Set<Fixer>();
     if (routerConfig) {
       if (routerConfig.enableLogging !== undefined) {
         this.enableLogging = routerConfig.enableLogging;
@@ -99,6 +102,9 @@ export class Router extends EventEmitter<{
       }
       if (routerConfig.preventSameLocationChange !== undefined) {
         this.preventSameLocationChange = routerConfig.preventSameLocationChange;
+      }
+      if (routerConfig.hotFixes) {
+        routerConfig.hotFixes.forEach((f) => this.hotFixes.add(f));
       }
     }
   }
@@ -130,6 +136,12 @@ export class Router extends EventEmitter<{
       state.history = [nextRoute.getPanelId()];
     }
     this.replace(state, nextRoute);
+    if (this.hasFixer(USE_DESKTOP_SAFARI_BACK_BUG)) {
+      window.history.pushState(
+        { ...state, 'USE_DESKTOP_SAFARI_BACK_BUG': '1' },
+        `page=${state.index}`, `#${nextRoute.getLocation()}`,
+      );
+    }
     window.removeEventListener('popstate', this.onPopState);
     window.addEventListener('popstate', this.onPopState);
     if (enterEvent) {
@@ -609,5 +621,9 @@ export class Router extends EventEmitter<{
 
   public onVKWebAppChangeFragment(location: string) {
     window.location.hash = location.startsWith('#') ? location : `#${location}`;
+  }
+
+  private hasFixer(fixer: Fixer): boolean {
+    return this.hotFixes.has(USE_ALL_FIXES) || this.hotFixes.has(fixer);
   }
 }
