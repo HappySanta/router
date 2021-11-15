@@ -1,7 +1,7 @@
 import { Page } from './Page';
 import { History, UpdateEventType } from './History';
 import { MODAL_KEY, POPUP_KEY, Route as MyRoute } from './Route';
-import { preventBlinkingBySettingScrollRestoration } from '../tools';
+import { isDesktopSafari, preventBlinkingBySettingScrollRestoration } from '../tools';
 import { State, stateFromLocation } from './State';
 import { EventEmitter } from 'tsee';
 
@@ -136,7 +136,7 @@ export class Router extends EventEmitter<{
       state.history = [nextRoute.getPanelId()];
     }
     this.replace(state, nextRoute);
-    if (this.hasFixer(USE_DESKTOP_SAFARI_BACK_BUG)) {
+    if (this.hasFixer(USE_DESKTOP_SAFARI_BACK_BUG) && isDesktopSafari()) {
       window.history.pushState(
         { ...state, 'USE_DESKTOP_SAFARI_BACK_BUG': '1' },
         `page=${state.index}`, `#${nextRoute.getLocation()}`,
