@@ -22,5 +22,10 @@ export function getDisplayName(WrappedComponent: {displayName?: string;name?: st
 
 export function isDesktopSafari(): boolean {
   const ua = window.navigator.userAgent;
-  return ua.indexOf('AppleWebKit/') > 0 && ua.indexOf('Safari/') > 0;
+  return ua.indexOf('AppleWebKit/') > 0
+    && ua.indexOf('Safari/') > 0
+    && !ua.includes('Chrome/')
+    && !ua.includes('Mobile/')
+    && !ua.includes('Android')
+    && !ua.includes('iPhone');
 }
