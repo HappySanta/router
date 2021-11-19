@@ -9,9 +9,9 @@ import {
   pushPage,
   setGlobalRouter,
   startGlobalRouter,
-} from './methods';
-import { Page } from './entities/Page';
-import { Router } from './entities/Router';
+} from '../lib/methods';
+import { Page } from '../lib/entities/Page';
+import { Router } from '../lib/entities/Router';
 
 test('route basic usage', () => {
   dangerousResetGlobalRouterUseForTestOnly();

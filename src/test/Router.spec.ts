@@ -2,11 +2,11 @@
  * @jest-environment jsdom
  */
 
-import { Router } from './Router';
-import { Page } from './Page';
-import { Route } from './Route';
-import { dangerousResetGlobalRouterUseForTestOnly } from '../methods';
-import { HistoryUpdateType } from './Types';
+import { Router } from '../lib/entities/Router';
+import { Page } from '../lib/entities/Page';
+import { Route } from '../lib/entities/Route';
+import { dangerousResetGlobalRouterUseForTestOnly } from '../lib/methods';
+import { HistoryUpdateType } from '../lib/entities/Types';
 
 function delay(time = 100) {
   return new Promise((resolve) => setTimeout(resolve, time));

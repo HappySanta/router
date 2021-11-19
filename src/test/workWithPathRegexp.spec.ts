@@ -1,4 +1,4 @@
-import { generatePath, matchPath } from './workWithPathRegexp';
+import { generatePath, matchPath } from '../lib/workWithPathRegexp';
 
 describe('matchPath', () => {
   test('/ and /', () => {

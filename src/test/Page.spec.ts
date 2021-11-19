@@ -1,4 +1,4 @@
-import { Page } from './Page';
+import { Page } from '../lib/entities/Page';
 
 test('page clone', () => {
   const page = new Page('vew_main', 'panel_main');

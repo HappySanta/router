@@ -44,10 +44,12 @@ export class Router extends EventEmitter<{
   blankMiddleware: RouterMiddleware[] = [];
   preventSameLocationChange = false;
   hotFixes: Set<Fixer>;
+  navigateInHash = true;
   /**
    * Значение window.location.hash которое было на момент старта роутера
    */
   startHash = '';
+  startLocation = '';
   private deferOnGoBack: (() => void) | null = null;
   private startHistoryOffset = 0;
   private started = false;
@@ -106,6 +108,9 @@ export class Router extends EventEmitter<{
       if (routerConfig.hotFixes) {
         routerConfig.hotFixes.forEach((f) => this.hotFixes.add(f));
       }
+      if (routerConfig.navigateInHash !== undefined) {
+        this.navigateInHash = routerConfig.navigateInHash;
+      }
     }
   }
 
@@ -125,21 +130,23 @@ export class Router extends EventEmitter<{
     }
     this.started = true;
     this.startHash = window.location.hash;
+    this.startLocation = this.readCurrentLocation();
     let enterEvent: [MyRoute, MyRoute | undefined] | null = null;
     this.startHistoryOffset = window.history.length;
-    let nextRoute = this.createRouteFromLocationWithReplace(window.location.hash);
+    let nextRoute = this.createRouteFromLocationWithReplace(this.readCurrentLocation());
     const state = stateFromLocation(this.history.getCurrentIndex());
     state.first = 1;
     if (state.blank === 1) {
-      nextRoute = this.performBlankMiddleware(nextRoute, window.location.hash);
+      nextRoute = this.performBlankMiddleware(nextRoute, this.readCurrentLocation());
       enterEvent = [nextRoute, this.history.getCurrentRoute()];
       state.history = [nextRoute.getPanelId()];
     }
     this.replace(state, nextRoute);
     if (this.hasFixer(USE_DESKTOP_SAFARI_BACK_BUG) && isDesktopSafari()) {
+      const location = this.formatLocation(nextRoute.getLocation());
       window.history.pushState(
         { ...state, 'USE_DESKTOP_SAFARI_BACK_BUG': '1' },
-        `page=${state.index}`, `#${nextRoute.getLocation()}`,
+        `page=${state.index}`, location,
       );
     }
     window.removeEventListener('popstate', this.onPopState);
@@ -299,7 +306,8 @@ export class Router extends EventEmitter<{
    */
   fixBrokenHistory() {
     this.history.getHistoryFromStartToCurrent().forEach(([r, s]) => {
-      window.history.pushState(s, `page=${s.index}`, `#${r.getLocation()}`);
+      const location = this.formatLocation(r.getLocation());
+      window.history.pushState(s, `page=${s.index}`, location);
     });
     this.startHistoryOffset = window.history.length - this.history.getLength();
   }
@@ -487,20 +495,21 @@ export class Router extends EventEmitter<{
   }
 
   private readonly onPopState = () => {
-    let nextRoute = this.createRouteFromLocationWithReplace(window.location.hash);
+    let nextRoute = this.createRouteFromLocationWithReplace(this.readCurrentLocation());
     const state = stateFromLocation(this.history.getCurrentIndex());
     let enterEvent: [MyRoute, MyRoute | undefined] | null = null;
     let updateEvent: UpdateEventType | null = null;
     if (state.blank === 1) {
       // Пустое состояние бывает когда приложение восстанавливают из кеша с другим хешом
       // такое состояние помечаем как первая страница
-      nextRoute = this.performBlankMiddleware(nextRoute, window.location.hash);
+      nextRoute = this.performBlankMiddleware(nextRoute, this.readCurrentLocation());
       state.first = 1;
       state.index = this.history.getCurrentIndex();
       state.history = [nextRoute.getPanelId()];
       enterEvent = [nextRoute, this.history.getCurrentRoute()];
       updateEvent = this.history.push(nextRoute, state);
-      window.history.replaceState(state, `page=${state.index}`, `#${nextRoute.getLocation()}`);
+      const location = this.formatLocation(nextRoute.getLocation());
+      window.history.replaceState(state, `page=${state.index}`, location);
     } else {
       updateEvent = this.history.setCurrentIndex(state.index);
     }
@@ -535,7 +544,8 @@ export class Router extends EventEmitter<{
     state.index = this.history.getCurrentIndex();
     state.blank = 0;
     const updateEvent = this.history.replace(nextRoute, state);
-    window.history.replaceState(state, `page=${state.index}`, `#${nextRoute.getLocation()}`);
+    const location = this.formatLocation(nextRoute.getLocation());
+    window.history.replaceState(state, `page=${state.index}`, location);
     preventBlinkingBySettingScrollRestoration();
 
     this.emit('update', ...updateEvent);
@@ -550,7 +560,8 @@ export class Router extends EventEmitter<{
     state.first = 0;
     let updateEvent = this.history.push(nextRoute, state);
     state.index = this.history.getCurrentIndex();
-    window.history.pushState(state, `page=${state.index}`, `#${nextRoute.getLocation()}`);
+    const location = this.formatLocation(nextRoute.getLocation());
+    window.history.pushState(state, `page=${state.index}`, location);
     preventBlinkingBySettingScrollRestoration();
 
     this.emit('update', ...updateEvent);
@@ -625,5 +636,20 @@ export class Router extends EventEmitter<{
 
   private hasFixer(fixer: Fixer): boolean {
     return this.hotFixes.has(USE_ALL_FIXES) || this.hotFixes.has(fixer);
+  }
+
+  private formatLocation(location: string): string {
+    if (this.navigateInHash && !location.startsWith('#')) {
+      return `#${location}`;
+    }
+    return location;
+  }
+
+  private readCurrentLocation(): string {
+    if (this.navigateInHash) {
+      return window.location.hash;
+    } else {
+      return window.location.pathname + window.location.search;
+    }
   }
 }

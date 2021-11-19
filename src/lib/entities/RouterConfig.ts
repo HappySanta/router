@@ -17,4 +17,13 @@ export interface RouterConfig {
   preventSameLocationChange?: boolean;
 
   hotFixes?: UsedFixers;
+
+  /**
+   * Если true то location будет читаться и писаться из window.location.hash
+   * иначе из window.location.pathname+search
+   *
+   * true -- для миниапов
+   * false -- для сайтов
+   */
+  navigateInHash?: boolean;
 }

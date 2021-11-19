@@ -1,7 +1,7 @@
-import { History } from './History';
-import { Route } from './Route';
-import { State, stateFromLocation } from './State';
-import { Page } from './Page';
+import { History } from '../lib/entities/History';
+import { Route } from '../lib/entities/Route';
+import { State, stateFromLocation } from '../lib/entities/State';
+import { Page } from '../lib/entities/Page';
 import { cleanup } from '@testing-library/react';
 
 function getRoute() {

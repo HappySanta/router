@@ -35,10 +35,24 @@ export class Route {
     this.uniqId = getNextUniqId();
   }
 
+  /**
+   * @param location обязательно без символа # в начале
+   */
   static getParamsFromPath(location: string) {
-    return location.includes('?')
-      ? (qs.parse(location.split('?', 2)[1]) as { [key: string]: string })
-      : {};
+    const qIndex = location.indexOf('?');
+    const ampIndex = location.indexOf('&');
+    const qFirst = qIndex !== -1 && (qIndex < ampIndex || ampIndex === -1);
+    if (qFirst) {
+      return qs.parse(location.split(/[?#]/usi, 3)[1]) as { [key: string]: string };
+    } else if (ampIndex !== -1) {
+      // Это эдж кейс когда кто-то делает ссылку на миниап
+      // vk.com/app131232#/user&utm_source=12&utm....
+      let data = location.split('&', 2)[1];
+      data = location.split('#', 2)[0];
+      return qs.parse(data) as { [key: string]: string };
+    }
+
+    return {};
   }
 
   /**
@@ -47,8 +61,8 @@ export class Route {
    * @param noSlash
    */
   static fromLocation(routeList: RouteList, location: string, noSlash = true) {
+    location = location.replace(/^#/usi, '');
     const params = Route.getParamsFromPath(location);
-    location = location.replace('#', '');
     if (noSlash && location.length && !location.startsWith('/')) {
       location = `/${location}`;
     }
