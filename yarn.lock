@@ -944,6 +944,13 @@
   dependencies:
     regenerator-runtime "^0.13.4"
 
+"@babel/runtime@^7.14.6":
+  version "7.16.3"
+  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.16.3.tgz#b86f0db02a04187a3c17caa77de69840165d42d5"
+  integrity sha512-WBwekcqacdY2e9AF/Q7WLFUWmdJGJTkbjqTjoMDgXkVZ3ZRUvOPsLb5KdwISoQVsbP+DQzVZW4Zhci0DvpbNTQ==
+  dependencies:
+    regenerator-runtime "^0.13.4"
+
 "@babel/template@^7.10.4", "@babel/template@^7.3.3":
   version "7.10.4"
   resolved "https://registry.yarnpkg.com/@babel/template/-/template-7.10.4.tgz#3251996c4200ebc71d1a8fc405fba940f36ba278"
@@ -1186,6 +1193,11 @@
     "@types/node" "*"
     "@types/yargs" "^15.0.0"
     chalk "^4.0.0"
+
+"@popperjs/core@^2.9.2":
+  version "2.10.2"
+  resolved "https://registry.yarnpkg.com/@popperjs/core/-/core-2.10.2.tgz#0798c03351f0dea1a5a4cabddf26a55a7cbee590"
+  integrity sha512-IXf3XA7+XyN7CP9gGh/XB0UxVMlvARGEgGXLubFICsUMGz6Q+DU+i4gGlpOxTjKvXjkJDJC8YdqdKkDj9qZHEQ==
 
 "@sinonjs/commons@^1.7.0":
   version "1.8.1"
@@ -1433,23 +1445,34 @@
     babel-eslint "^10.0.3"
     eslint-config-google "^0.9.1"
 
-"@vkontakte/icons@^1.112.0":
-  version "1.112.0"
-  resolved "https://registry.yarnpkg.com/@vkontakte/icons/-/icons-1.112.0.tgz#3bdb657cf328681d01ed9f0c58b20604e544184d"
-  integrity sha512-YsnKsF3Sm/ffTUkcYtkApGy0Meqjld6y13Z4qo7fGirOV7061R377SurnpyqP/8MFh6H1D1Z085XnpdUFPQJMg==
+"@vkontakte/icons@^1.135.0":
+  version "1.135.0"
+  resolved "https://registry.yarnpkg.com/@vkontakte/icons/-/icons-1.135.0.tgz#abd58e40f3c7f9eb4004d4f3c33c65ae9bd0befe"
+  integrity sha512-gOg6B5Ce3WrjMA3wtFav6wEL1urTT9ee3nx2fqQeZY/i8U6aGW1v84zztr7Vuop7qwyml843QU3x48hBD8n/8A==
   dependencies:
     es6-object-assign "1.1.0"
     svg-baker-runtime "1.4.7"
 
-"@vkontakte/vk-bridge@^2.2.8":
-  version "2.2.8"
-  resolved "https://registry.yarnpkg.com/@vkontakte/vk-bridge/-/vk-bridge-2.2.8.tgz#5f89f489e90265c151908f021ad2d932bb376f25"
-  integrity sha512-1Ky2592PoJRETScOnO0QwrryCIQLAe8gGiYwci4uPVKMlYp/ynTc/AF6Fr/jd/0RxEyGLal8cBwCzfrqCuzA+w==
+"@vkontakte/vk-bridge@^2.4.8":
+  version "2.4.8"
+  resolved "https://registry.yarnpkg.com/@vkontakte/vk-bridge/-/vk-bridge-2.4.8.tgz#379bbd24a059490426a33a0818e240d7ec8860a7"
+  integrity sha512-YGTZZsm9OO/JRRBM6HHGCPMN3yiQcBUxFLCK7bCUcFWvWghFZdWQvPtuCKXONwhBMwp1Wo90kSV5rXSvJA8lOQ==
 
-"@vkontakte/vkui@^4.0.0-beta.27":
-  version "4.0.0-beta.27"
-  resolved "https://registry.yarnpkg.com/@vkontakte/vkui/-/vkui-4.0.0-beta.27.tgz#e379f34cf782d7a663cb09658b313a09ccad1c0f"
-  integrity sha512-wgxr7YIYl/YHW7VCenwcYQ2jRCYhm0DdeOjVP5yh7KO0mZMssVb49iK1Bnl5BOCsgEOfrTHLOu1siRLb7l1GdQ==
+"@vkontakte/vkjs@^0.22.1":
+  version "0.22.1"
+  resolved "https://registry.yarnpkg.com/@vkontakte/vkjs/-/vkjs-0.22.1.tgz#ab740365626873fd7940c3b430d438d5bf33b110"
+  integrity sha512-gDlJYAIIH4K0L8Qz2bE/cIdz5XWSwvEVytkK4mXC7lGTVTF/PuidUb8MZ792AaqTxdoASOoBD1Jy89q/GjaOSg==
+
+"@vkontakte/vkui@^4.22.1":
+  version "4.22.1"
+  resolved "https://registry.yarnpkg.com/@vkontakte/vkui/-/vkui-4.22.1.tgz#fcd41148b5a11db190389c2b67a519936132dab3"
+  integrity sha512-bH8nuwfWSTsGfkIrbQ4iI49xi+1+aUSFmBwTvy79xDqHgDhU1A4oQidYXReEtbOe8AUcfjTwHpPq+URysl5b0w==
+  dependencies:
+    "@babel/runtime" "^7.14.6"
+    "@popperjs/core" "^2.9.2"
+    "@vkontakte/vkjs" "^0.22.1"
+    mitt "^3.0.0"
+    react-popper "^2.2.5"
 
 "@webassemblyjs/ast@1.9.0":
   version "1.9.0"
@@ -5156,6 +5179,11 @@ mitt@1.1.2:
   resolved "https://registry.yarnpkg.com/mitt/-/mitt-1.1.2.tgz#380e61480d6a615b660f07abb60d51e0a4e4bed6"
   integrity sha1-OA5hSA1qYVtmDwertg1R4KTkvtY=
 
+mitt@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/mitt/-/mitt-3.0.0.tgz#69ef9bd5c80ff6f57473e8d89326d01c414be0bd"
+  integrity sha512-7dX2/10ITVyqh4aOSVI9gdape+t9l2/8QxHrFmUXu4EEUpdlxl6RudZUPZoc+zuY2hk1j7XxVroIVIan/pD/SQ==
+
 mixin-deep@^1.2.0:
   version "1.3.2"
   resolved "https://registry.yarnpkg.com/mixin-deep/-/mixin-deep-1.3.2.tgz#1120b43dc359a785dce65b55b82e257ccf479566"
@@ -5915,20 +5943,32 @@ randomfill@^1.0.3:
     randombytes "^2.0.5"
     safe-buffer "^5.1.0"
 
-react-dom@^16.13.1:
-  version "16.13.1"
-  resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-16.13.1.tgz#c1bd37331a0486c078ee54c4740720993b2e0e7f"
-  integrity sha512-81PIMmVLnCNLO/fFOQxdQkvEq/+Hfpv24XNJfpyZhTRfO0QcmQIF/PgCa1zCOj2w1hrn12MFLyaJ/G0+Mxtfag==
+react-dom@^17.0.2:
+  version "17.0.2"
+  resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-17.0.2.tgz#ecffb6845e3ad8dbfcdc498f0d0a939736502c23"
+  integrity sha512-s4h96KtLDUQlsENhMn1ar8t2bEa+q/YAtj8pPPdIjPDGBDIVNsrD9aXNWqspUe6AzKCIG0C1HZZLqLV7qpOBGA==
   dependencies:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"
-    prop-types "^15.6.2"
-    scheduler "^0.19.1"
+    scheduler "^0.20.2"
+
+react-fast-compare@^3.0.1:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/react-fast-compare/-/react-fast-compare-3.2.0.tgz#641a9da81b6a6320f270e89724fb45a0b39e43bb"
+  integrity sha512-rtGImPZ0YyLrscKI9xTpV8psd6I8VAtjKCzQDlzyDvqJA8XOW78TXYQwNRNd8g8JZnDu8q9Fu/1v4HPAVwVdHA==
 
 react-is@^16.12.0, react-is@^16.8.1, react-is@^16.8.6:
   version "16.13.1"
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.13.1.tgz#789729a4dc36de2999dc156dd6c1d9c18cea56a4"
   integrity sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==
+
+react-popper@^2.2.5:
+  version "2.2.5"
+  resolved "https://registry.yarnpkg.com/react-popper/-/react-popper-2.2.5.tgz#1214ef3cec86330a171671a4fbcbeeb65ee58e96"
+  integrity sha512-kxGkS80eQGtLl18+uig1UIf9MKixFSyPxglsgLBxlYnyDf65BiY9B3nZSc6C9XUNDgStROB0fMQlTEz1KxGddw==
+  dependencies:
+    react-fast-compare "^3.0.1"
+    warning "^4.0.2"
 
 react-test-renderer@^16.13.1:
   version "16.13.1"
@@ -5940,14 +5980,13 @@ react-test-renderer@^16.13.1:
     react-is "^16.8.6"
     scheduler "^0.19.1"
 
-react@^16.13.1:
-  version "16.13.1"
-  resolved "https://registry.yarnpkg.com/react/-/react-16.13.1.tgz#2e818822f1a9743122c063d6410d85c1e3afe48e"
-  integrity sha512-YMZQQq32xHLX0bz5Mnibv1/LHb3Sqzngu7xstSM+vrkE5Kzr9xE0yMByK5kMoTK30YVJE61WfbxIFFvfeDKT1w==
+react@^17.0.2:
+  version "17.0.2"
+  resolved "https://registry.yarnpkg.com/react/-/react-17.0.2.tgz#d0b5cc516d29eb3eee383f75b62864cfb6800037"
+  integrity sha512-gnhPt75i/dq/z3/6q/0asP78D0u592D5L1pd7M8P+dck6Fu/jJeL6iVVK23fptSUZj8Vjf++7wXA8UNclGQcbA==
   dependencies:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"
-    prop-types "^15.6.2"
 
 read-pkg-up@^7.0.1:
   version "7.0.1"
@@ -6317,6 +6356,14 @@ scheduler@^0.19.1:
   version "0.19.1"
   resolved "https://registry.yarnpkg.com/scheduler/-/scheduler-0.19.1.tgz#4f3e2ed2c1a7d65681f4c854fa8c5a1ccb40f196"
   integrity sha512-n/zwRWRYSUj0/3g/otKDRPMh6qv2SYMWNq85IEa8iZyAv8od9zDYpGSnpBEjNgcMNq6Scbu5KfIPxNF72R/2EA==
+  dependencies:
+    loose-envify "^1.1.0"
+    object-assign "^4.1.1"
+
+scheduler@^0.20.2:
+  version "0.20.2"
+  resolved "https://registry.yarnpkg.com/scheduler/-/scheduler-0.20.2.tgz#4baee39436e34aa93b4874bddcbf0fe8b8b50e91"
+  integrity sha512-2eWfGgAqqWFGqtdMmcL5zCMK1U8KlXv8SQFGglL3CEtd0aDVDWgeF/YoCmvln55m5zSk3J/20hTaSBeSObsQDQ==
   dependencies:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"
@@ -7365,6 +7412,13 @@ walker@^1.0.7, walker@~1.0.5:
   integrity sha1-L3+bj9ENZ3JisYqITijRlhjgKPs=
   dependencies:
     makeerror "1.0.x"
+
+warning@^4.0.2:
+  version "4.0.3"
+  resolved "https://registry.yarnpkg.com/warning/-/warning-4.0.3.tgz#16e9e077eb8a86d6af7d64aa1e05fd85b4678ca3"
+  integrity sha512-rpJyN222KWIvHJ/F53XSZv0Zl/accqHR8et1kpaMTD/fLCRxtV8iX8czMzY7sVZupTI3zcUTg8eycS2kNF9l6w==
+  dependencies:
+    loose-envify "^1.0.0"
 
 watchpack-chokidar2@^2.0.0:
   version "2.0.0"
