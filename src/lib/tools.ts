@@ -3,12 +3,16 @@
  * @packageDocumentation
  */
 
+import { canUseDOM } from './dom';
+
 /**
  * @ignore
  */
 export function preventBlinkingBySettingScrollRestoration() {
-  if ('scrollRestoration' in window.history && window.history.scrollRestoration === 'auto') {
-    window.history.scrollRestoration = 'manual';
+  if (canUseDOM) {
+    if ('scrollRestoration' in window.history && window.history.scrollRestoration === 'auto') {
+      window.history.scrollRestoration = 'manual';
+    }
   }
 }
 
@@ -16,11 +20,14 @@ export function preventBlinkingBySettingScrollRestoration() {
  * @ignore
  * @param WrappedComponent
  */
-export function getDisplayName(WrappedComponent: {displayName?: string;name?: string}) {
+export function getDisplayName(WrappedComponent: { displayName?: string; name?: string }) {
   return WrappedComponent.displayName || WrappedComponent.name || 'Component';
 }
 
 export function isDesktopSafari(): boolean {
+  if (!canUseDOM) {
+    return false;
+  }
   const ua = window.navigator.userAgent;
   return ua.indexOf('AppleWebKit/') > 0
     && ua.indexOf('Safari/') > 0

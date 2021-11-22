@@ -10,6 +10,7 @@ import { RouterConfig } from './RouterConfig';
 import { Location } from './Location';
 import { HistoryUpdateType, PageParams } from './Types';
 import { Fixer, USE_ALL_FIXES, USE_DESKTOP_SAFARI_BACK_BUG } from './HotFixers';
+import { canUseDOM } from '../dom';
 
 export declare type RouteList = { [key: string]: Page };
 
@@ -53,6 +54,7 @@ export class Router extends EventEmitter<{
   private deferOnGoBack: (() => void) | null = null;
   private startHistoryOffset = 0;
   private started = false;
+  private readonly ssrLocation: string | null = null;
   private readonly infinityPanelCacheInstance: Map<string, string[]> = new Map<string, string[]>();
   private readonly performBlankMiddleware = (route: MyRoute, hash: string) => {
     return this.blankMiddleware.reduce((route, middleware) => {
@@ -111,14 +113,23 @@ export class Router extends EventEmitter<{
       if (routerConfig.navigateInHash !== undefined) {
         this.navigateInHash = routerConfig.navigateInHash;
       }
+      if (routerConfig.ssrLocation !== undefined) {
+        this.ssrLocation = routerConfig.ssrLocation;
+      }
     }
   }
 
   private static back() {
+    if (!canUseDOM) {
+      return;
+    }
     window.history.back();
   }
 
   private static backTo(x: number) {
+    if (!canUseDOM) {
+      return;
+    }
     window.history.go(x);
   }
 
@@ -129,10 +140,10 @@ export class Router extends EventEmitter<{
       throw new Error('start method call twice! this is not allowed');
     }
     this.started = true;
-    this.startHash = window.location.hash;
+    this.startHash = canUseDOM ? window.location.hash : '';
     this.startLocation = this.readCurrentLocation();
     let enterEvent: [MyRoute, MyRoute | undefined] | null = null;
-    this.startHistoryOffset = window.history.length;
+    this.startHistoryOffset = canUseDOM ? window.history.length : 1;
     let nextRoute = this.createRouteFromLocationWithReplace(this.readCurrentLocation());
     const state = stateFromLocation(this.history.getCurrentIndex());
     state.first = 1;
@@ -142,15 +153,17 @@ export class Router extends EventEmitter<{
       state.history = [nextRoute.getPanelId()];
     }
     this.replace(state, nextRoute);
-    if (this.hasFixer(USE_DESKTOP_SAFARI_BACK_BUG) && isDesktopSafari()) {
+    if (canUseDOM && this.hasFixer(USE_DESKTOP_SAFARI_BACK_BUG) && isDesktopSafari()) {
       const location = this.formatLocation(nextRoute.getLocation());
       window.history.pushState(
         { ...state, 'USE_DESKTOP_SAFARI_BACK_BUG': '1' },
         `page=${state.index}`, location,
       );
     }
-    window.removeEventListener('popstate', this.onPopState);
-    window.addEventListener('popstate', this.onPopState);
+    if (canUseDOM) {
+      window.removeEventListener('popstate', this.onPopState);
+      window.addEventListener('popstate', this.onPopState);
+    }
     if (enterEvent) {
       this.emit('enter', ...enterEvent);
     }
@@ -158,7 +171,9 @@ export class Router extends EventEmitter<{
 
   stop() {
     this.started = false;
-    window.removeEventListener('popstate', this.onPopState);
+    if (canUseDOM) {
+      window.removeEventListener('popstate', this.onPopState);
+    }
   }
 
   getCurrentRouteOrDef(): MyRoute {
@@ -288,6 +303,7 @@ export class Router extends EventEmitter<{
    *  История ломается когда открывается VKPay или пост из колокольчика
    */
   isHistoryBroken(): boolean {
+    if (!canUseDOM) {return false;}
     return window.history.length !== this.history.getLength() + this.startHistoryOffset;
   }
 
@@ -305,6 +321,9 @@ export class Router extends EventEmitter<{
    * [X1, X2, X3, Y1, Y1, X1, X2, X3]
    */
   fixBrokenHistory() {
+    if (!canUseDOM) {
+      return;
+    }
     this.history.getHistoryFromStartToCurrent().forEach(([r, s]) => {
       const location = this.formatLocation(r.getLocation());
       window.history.pushState(s, `page=${s.index}`, location);
@@ -509,7 +528,9 @@ export class Router extends EventEmitter<{
       enterEvent = [nextRoute, this.history.getCurrentRoute()];
       updateEvent = this.history.push(nextRoute, state);
       const location = this.formatLocation(nextRoute.getLocation());
-      window.history.replaceState(state, `page=${state.index}`, location);
+      if (canUseDOM) {
+        window.history.replaceState(state, `page=${state.index}`, location);
+      }
     } else {
       updateEvent = this.history.setCurrentIndex(state.index);
     }
@@ -540,12 +561,14 @@ export class Router extends EventEmitter<{
     if (!state.blank && this.needPreventSameLocationChange(nextRoute)) {
       return;
     }
-    state.length = window.history.length;
+    state.length = canUseDOM ? window.history.length : 1;
     state.index = this.history.getCurrentIndex();
     state.blank = 0;
     const updateEvent = this.history.replace(nextRoute, state);
     const location = this.formatLocation(nextRoute.getLocation());
-    window.history.replaceState(state, `page=${state.index}`, location);
+    if (canUseDOM) {
+      window.history.replaceState(state, `page=${state.index}`, location);
+    }
     preventBlinkingBySettingScrollRestoration();
 
     this.emit('update', ...updateEvent);
@@ -555,13 +578,15 @@ export class Router extends EventEmitter<{
     if (this.needPreventSameLocationChange(nextRoute)) {
       return;
     }
-    state.length = window.history.length;
+    state.length = canUseDOM ? window.history.length : 1;
     state.blank = 0;
     state.first = 0;
     let updateEvent = this.history.push(nextRoute, state);
     state.index = this.history.getCurrentIndex();
     const location = this.formatLocation(nextRoute.getLocation());
-    window.history.pushState(state, `page=${state.index}`, location);
+    if (canUseDOM) {
+      window.history.pushState(state, `page=${state.index}`, location);
+    }
     preventBlinkingBySettingScrollRestoration();
 
     this.emit('update', ...updateEvent);
@@ -631,7 +656,9 @@ export class Router extends EventEmitter<{
   }
 
   public onVKWebAppChangeFragment(location: string) {
-    window.location.hash = location.startsWith('#') ? location : `#${location}`;
+    if (canUseDOM) {
+      window.location.hash = location.startsWith('#') ? location : `#${location}`;
+    }
   }
 
   private hasFixer(fixer: Fixer): boolean {
@@ -646,6 +673,12 @@ export class Router extends EventEmitter<{
   }
 
   private readCurrentLocation(): string {
+    if (!canUseDOM) {
+      if (this.ssrLocation) {
+        return this.ssrLocation;
+      }
+      return '/';
+    }
     if (this.navigateInHash) {
       return window.location.hash;
     } else {

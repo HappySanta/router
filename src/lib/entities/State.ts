@@ -3,6 +3,8 @@
  * @packageDocumentation
  */
 
+import { canUseDOM } from '../dom';
+
 /**
  * @ignore
  */
@@ -31,7 +33,7 @@ export function __testResetHistoryUniqueId() {
  * @param currentIndex
  */
 export function stateFromLocation(currentIndex: number): State {
-  const state = window.history.state;
+  const state = canUseDOM ? window.history.state : {};
   if (state && typeof state === 'object') {
     const s = state as State;
     if (s.i === randomIdForCheckState) {
@@ -41,7 +43,7 @@ export function stateFromLocation(currentIndex: number): State {
   return {
     blank: 1,
     first: 0,
-    length: window.history.length,
+    length: canUseDOM ? window.history.length : 1,
     index: currentIndex,
     history: [],
     i: randomIdForCheckState,

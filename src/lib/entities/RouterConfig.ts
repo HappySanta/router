@@ -26,4 +26,6 @@ export interface RouterConfig {
    * false -- для сайтов
    */
   navigateInHash?: boolean;
+
+  ssrLocation?: string;
 }
