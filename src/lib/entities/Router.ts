@@ -303,7 +303,9 @@ export class Router extends EventEmitter<{
    *  История ломается когда открывается VKPay или пост из колокольчика
    */
   isHistoryBroken(): boolean {
-    if (!canUseDOM) {return false;}
+    if (!canUseDOM) {
+      return false;
+    }
     return window.history.length !== this.history.getLength() + this.startHistoryOffset;
   }
 
@@ -684,5 +686,22 @@ export class Router extends EventEmitter<{
     } else {
       return window.location.pathname + window.location.search;
     }
+  }
+
+  public getPageLocation(pageId: string, params?: PageParams): string {
+    const route = MyRoute.fromPageId(this.routes, pageId, params);
+    return this.formatLocation(route.getLocation());
+  }
+
+  public getModalLocation(modalId: string, params?: PageParams): string {
+    const route = this.getCurrentRouteOrDef();
+    const location = route.clone().setModalId(modalId).setParams(params).getLocation();
+    return this.formatLocation(location);
+  }
+
+  public getPopupLocation(popupId: string, params?: PageParams): string {
+    const route = this.getCurrentRouteOrDef();
+    const location = route.clone().setPopupId(popupId).setParams(params).getLocation();
+    return this.formatLocation(location);
   }
 }

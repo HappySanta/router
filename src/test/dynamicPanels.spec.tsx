@@ -10,11 +10,8 @@ import {
   useThrottlingLocation,
 } from '..';
 import React from 'react';
-import Root from '@vkontakte/vkui/dist/components/Root/Root';
-import View from '@vkontakte/vkui/dist/components/View/View';
-import Panel from '@vkontakte/vkui/dist/components/Panel/Panel';
+import { ConfigProvider, Panel, Root, View } from '@vkontakte/vkui';
 import { act, cleanup, render } from '@testing-library/react';
-import ConfigProvider from '@vkontakte/vkui/dist/components/ConfigProvider/ConfigProvider';
 
 describe('dynamic panels', () => {
   afterEach(() => {
@@ -61,7 +58,7 @@ describe('dynamic panels', () => {
       return (
         <Root onTransition={() => onTransition()} activeView={location.getViewId()}>
           <View onTransition={() => onTransition()}
-            activePanel={location.getViewActivePanel(VIEW_MAIN)}
+            activePanel={location.getViewActivePanel(VIEW_MAIN) || ''}
             history={location.getViewHistory(VIEW_MAIN)}
             id={VIEW_MAIN}>
             {panelList}

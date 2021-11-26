@@ -205,3 +205,26 @@ test('popPageToAndReplace', async (done) => {
   expect(r.history.getCurrentIndex()).toBe(0);
   await done();
 });
+
+test('get locations', () => {
+  dangerousResetGlobalRouterUseForTestOnly();
+  const r = new Router({
+    '/': new Page(),
+    '/user': new Page('user'),
+    '/product': new Page('user'),
+    '/done': new Page('done'),
+  });
+  r.start();
+
+  expect(r.getPageLocation('/')).toBe('#/');
+  expect(r.getPageLocation('/product')).toBe('#/product');
+  expect(r.getPageLocation('/product', { id: '1' })).toBe('#/product?id=1');
+  expect(r.getModalLocation('hello')).toBe('#/?m=hello');
+  expect(r.getPopupLocation('world')).toBe('#/?p=world');
+  expect(r.getModalLocation('hello', { name: 'ivan' })).toBe('#/?m=hello&name=ivan');
+  expect(r.getPopupLocation('world', { age: '25' })).toBe('#/?p=world&age=25');
+
+  r.pushPage('/product');
+
+  expect(r.getPopupLocation('world', { age: '25' })).toBe('#/product?p=world&age=25');
+});
