@@ -18,7 +18,7 @@ test('route basic usage', async (done) => {
     '/': new Page(),
     '/user': new Page('user'),
     '/info': new Page('info'),
-  }, null);
+  });
 
   const recordEvents: Array<{ newRoute: Route; oldRoute: Route | undefined; isNewRoute: boolean; type: HistoryUpdateType }> = [];
 
@@ -60,7 +60,7 @@ test('route first page push', async (done) => {
     '/': new Page(),
     '/user': new Page('user'),
     '/info': new Page('info'),
-  }, null);
+  });
 
   r.start();
   await delay(100);
@@ -81,7 +81,7 @@ test('route first page replace', async (done) => {
     '/': new Page(),
     '/user': new Page('user'),
     '/info': new Page('info'),
-  }, null);
+  });
 
   r.start();
   await delay(100);
@@ -107,7 +107,7 @@ test('check history', async (done) => {
     '/info': new Page('info', 'main'),
     '/create': new Page('create', 'create'),
     '/done': new Page('done', 'create'),
-  }, null);
+  });
 
   r.start();
 

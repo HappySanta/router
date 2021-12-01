@@ -171,12 +171,6 @@ export class Route {
     this.params[MODAL_KEY] = modalId;
     return this;
   }
-
-  out() {
-    // $TSFixMe
-  }
-
-  in() {
-    // $TSFixMe
-  }
 }
+
+export declare type ReplaceUnknownRouteFn = (newRoute: Route, oldRoute?: Route) => Route;

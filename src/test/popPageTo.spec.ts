@@ -14,7 +14,7 @@ describe('popPageTo', () => {
       '/info': new Page('info', 'main'),
       '/create': new Page('create', 'create'),
       '/done': new Page('done', 'create'),
-    }, null);
+    });
 
     r.start();
 

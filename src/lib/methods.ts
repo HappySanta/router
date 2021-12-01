@@ -16,7 +16,7 @@ let globalRouter: Router | null = null;
  * @param routes
  * @param config
  */
-export function startGlobalRouter(routes: RouteList, config: RouterConfig | null = null): Router {
+export function startGlobalRouter(routes: RouteList, config?: Partial<RouterConfig>): Router {
   if (globalRouter) {
     throw new Error('startGlobalRouter called twice is not allowed');
   }

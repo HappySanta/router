@@ -5,8 +5,7 @@ import { isDesktopSafari, preventBlinkingBySettingScrollRestoration } from '../t
 import { State, stateFromLocation } from './State';
 import { EventEmitter } from 'tsee';
 
-import { PAGE_MAIN, PANEL_MAIN, ROOT_MAIN, VIEW_MAIN } from '../const';
-import { RouterConfig } from './RouterConfig';
+import { defaultRouterConfig, RouterConfig } from './RouterConfig';
 import { Location } from './Location';
 import { HistoryUpdateType, PageParams } from './Types';
 import { Fixer, USE_ALL_FIXES, USE_DESKTOP_SAFARI_BACK_BUG } from './HotFixers';
@@ -14,7 +13,6 @@ import { canUseDOM } from '../dom';
 
 export declare type RouteList = { [key: string]: Page };
 
-export declare type ReplaceUnknownRouteFn = (newRoute: MyRoute, oldRoute?: MyRoute) => MyRoute;
 /**
  * @ignore
  */
@@ -34,30 +32,20 @@ export class Router extends EventEmitter<{
   update: UpdateEventFn;
   enter: EnterEventFn;
 }> {
-  routes: RouteList = {};
-  history: History;
-  enableLogging = false;
-  defaultPage: string = PAGE_MAIN;
-  defaultView: string = VIEW_MAIN;
-  defaultRoot: string = ROOT_MAIN;
-  defaultPanel: string = PANEL_MAIN;
-  alwaysStartWithSlash = true;
-  blankMiddleware: RouterMiddleware[] = [];
-  preventSameLocationChange = false;
-  hotFixes: Set<Fixer>;
-  navigateInHash = true;
+  public routes: RouteList = {};
+  public history: History;
+  public config: RouterConfig;
   /**
    * Значение window.location.hash которое было на момент старта роутера
    */
-  startHash = '';
-  startLocation = '';
+  public startHash = '';
+  public startLocation = '';
   private deferOnGoBack: (() => void) | null = null;
   private startHistoryOffset = 0;
   private started = false;
-  private readonly ssrLocation: string | null = null;
   private readonly infinityPanelCacheInstance: Map<string, string[]> = new Map<string, string[]>();
   private readonly performBlankMiddleware = (route: MyRoute, hash: string) => {
-    return this.blankMiddleware.reduce((route, middleware) => {
+    return this.config.blankMiddleware.reduce((route, middleware) => {
       return middleware(route, hash);
     }, route);
   };
@@ -80,43 +68,29 @@ export class Router extends EventEmitter<{
    * @param routes
    * @param routerConfig
    */
-  constructor(routes: RouteList, routerConfig: RouterConfig | null = null) {
+  constructor(routes: RouteList, routerConfig?: Partial<RouterConfig>) {
     super();
     this.routes = routes;
     this.history = new History();
-    this.hotFixes = new Set<Fixer>();
-    if (routerConfig) {
-      if (routerConfig.enableLogging !== undefined) {
-        this.enableLogging = routerConfig.enableLogging;
-      }
-      if (routerConfig.defaultPage !== undefined) {
-        this.defaultPage = routerConfig.defaultPage;
-      }
-      if (routerConfig.defaultView !== undefined) {
-        this.defaultView = routerConfig.defaultView;
-      }
-      if (routerConfig.defaultPanel !== undefined) {
-        this.defaultPanel = routerConfig.defaultPanel;
-      }
-      if (routerConfig.noSlash !== undefined) {
-        this.alwaysStartWithSlash = routerConfig.noSlash;
-      }
-      if (routerConfig.blankMiddleware !== undefined) {
-        this.blankMiddleware = routerConfig.blankMiddleware;
-      }
-      if (routerConfig.preventSameLocationChange !== undefined) {
-        this.preventSameLocationChange = routerConfig.preventSameLocationChange;
-      }
-      if (routerConfig.hotFixes) {
-        routerConfig.hotFixes.forEach((f) => this.hotFixes.add(f));
-      }
-      if (routerConfig.navigateInHash !== undefined) {
-        this.navigateInHash = routerConfig.navigateInHash;
-      }
-      if (routerConfig.ssrLocation !== undefined) {
-        this.ssrLocation = routerConfig.ssrLocation;
-      }
+    this.config = { ...defaultRouterConfig, ...routerConfig || {} };
+    if (this.config.readLocationInConstructor) {
+      this.setup();
     }
+  }
+
+  protected setup() {
+    let nextRoute = this.createRouteFromLocationWithReplace(this.readCurrentLocation());
+    const state = stateFromLocation(this.history.getCurrentIndex());
+    state.first = 1;
+    if (state.blank === 1) {
+      nextRoute = this.performBlankMiddleware(nextRoute, this.readCurrentLocation());
+      state.history = [nextRoute.getPanelId()];
+    }
+    state.length = canUseDOM ? window.history.length : 1;
+    state.index = this.history.getCurrentIndex();
+    state.blank = 0;
+    const updateEvent = this.history.replace(nextRoute, state);
+    this.log('setup location', updateEvent);
   }
 
   private static back() {
@@ -132,8 +106,6 @@ export class Router extends EventEmitter<{
     }
     window.history.go(x);
   }
-
-  replacerUnknownRoute: ReplaceUnknownRouteFn = (r) => r;
 
   start() {
     if (this.started) {
@@ -181,7 +153,7 @@ export class Router extends EventEmitter<{
     if (r) {
       return r;
     }
-    return this.createRouteFromLocation(this.defaultPage);
+    return this.createRouteFromLocation(this.config.defaultPage);
   }
 
   getCurrentStateOrDef(): State {
@@ -193,7 +165,7 @@ export class Router extends EventEmitter<{
   }
 
   log(...args: any) {
-    if (!this.enableLogging) {
+    if (!this.config.enableLogging) {
       return;
     }
     console.log.apply(this, args);
@@ -502,12 +474,12 @@ export class Router extends EventEmitter<{
 
   private getDefaultRoute(location: string, params: PageParams) {
     try {
-      return MyRoute.fromLocation(this.routes, '/', this.alwaysStartWithSlash);
+      return MyRoute.fromLocation(this.routes, '/', this.config.alwaysStartWithSlash);
     } catch (e) {
       if (e && e.message === 'ROUTE_NOT_FOUND') {
         return new MyRoute(
-          new Page(this.defaultPanel, this.defaultView, this.defaultRoot),
-          this.defaultPage,
+          new Page(this.config.defaultPanel, this.config.defaultView, this.config.defaultRoot),
+          this.config.defaultPage,
           params,
         );
       }
@@ -600,11 +572,11 @@ export class Router extends EventEmitter<{
    */
   public createRouteFromLocationWithReplace(location: string): MyRoute {
     try {
-      return MyRoute.fromLocation(this.routes, location, this.alwaysStartWithSlash);
+      return MyRoute.fromLocation(this.routes, location, this.config.alwaysStartWithSlash);
     } catch (e) {
       if (e && e.message === 'ROUTE_NOT_FOUND') {
         const def = this.getDefaultRoute(location, MyRoute.getParamsFromPath(location));
-        return this.replacerUnknownRoute(def, this.history.getCurrentRoute());
+        return this.config.replacerUnknownRoute(def, this.history.getCurrentRoute());
       }
       throw e;
     }
@@ -612,7 +584,7 @@ export class Router extends EventEmitter<{
 
   private createRouteFromLocation(location: string): MyRoute {
     try {
-      return MyRoute.fromLocation(this.routes, location, this.alwaysStartWithSlash);
+      return MyRoute.fromLocation(this.routes, location, this.config.alwaysStartWithSlash);
     } catch (e) {
       if (e && e.message === 'ROUTE_NOT_FOUND') {
         return this.getDefaultRoute(location, MyRoute.getParamsFromPath(location));
@@ -654,7 +626,7 @@ export class Router extends EventEmitter<{
   }
 
   private needPreventSameLocationChange(nextRoute: MyRoute) {
-    return this.preventSameLocationChange && Router.isSameLocation(this.getCurrentRouteOrDef(), nextRoute);
+    return this.config.preventSameLocationChange && Router.isSameLocation(this.getCurrentRouteOrDef(), nextRoute);
   }
 
   public onVKWebAppChangeFragment(location: string) {
@@ -664,11 +636,11 @@ export class Router extends EventEmitter<{
   }
 
   private hasFixer(fixer: Fixer): boolean {
-    return this.hotFixes.has(USE_ALL_FIXES) || this.hotFixes.has(fixer);
+    return this.config.hotFixes.includes(USE_ALL_FIXES) || this.config.hotFixes.includes(fixer);
   }
 
   private formatLocation(location: string): string {
-    if (this.navigateInHash && !location.startsWith('#')) {
+    if (this.config.navigateInHash && !location.startsWith('#')) {
       return `#${location}`;
     }
     return location;
@@ -676,12 +648,12 @@ export class Router extends EventEmitter<{
 
   private readCurrentLocation(): string {
     if (!canUseDOM) {
-      if (this.ssrLocation) {
-        return this.ssrLocation;
+      if (this.config.ssrLocation !== undefined) {
+        return this.config.ssrLocation;
       }
       return '/';
     }
-    if (this.navigateInHash) {
+    if (this.config.navigateInHash) {
       return window.location.hash;
     } else {
       return window.location.pathname + window.location.search;

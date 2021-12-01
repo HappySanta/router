@@ -41,8 +41,6 @@ export class History {
     this.stack.push([r, s]);
     this.currentIndex = this.stack.length - 1;
     const next = this.getCurrentRoute();
-    current?.out();
-    next?.in();
     if (next) {
       this.setLastPanelInView(next, current);
       return [next, current, true, HISTORY_UPDATE_PUSH];
@@ -57,8 +55,6 @@ export class History {
     const current = this.getCurrentRoute();
     this.stack[this.currentIndex] = [r, s];
     const next = this.getCurrentRoute();
-    current?.out();
-    next?.in();
     if (next) {
       this.setLastPanelInView(next, current);
       return [next, current, true, HISTORY_UPDATE_REPLACE];
@@ -73,8 +69,6 @@ export class History {
     const current = this.getCurrentRoute();
     this.currentIndex = x;
     const next = this.getCurrentRoute();
-    current?.out();
-    next?.in();
     if (next) {
       this.setLastPanelInView(next, current);
       return [next, current, false, HISTORY_UPDATE_MOVE];

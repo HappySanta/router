@@ -14,7 +14,7 @@ describe('restoreFromCache', () => {
       '/info': new Page('info', 'main'),
       '/create': new Page('create', 'main'),
       '/done': new Page('done', 'main'),
-    }, null);
+    });
 
     r.start();
 

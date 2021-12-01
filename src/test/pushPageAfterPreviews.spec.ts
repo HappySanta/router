@@ -17,7 +17,7 @@ describe('pushPageAfterPreviews', () => {
       '/info': new Page('info', 'main'),
       '/create': new Page('create', 'create'),
       '/done': new Page('done', 'create'),
-    }, null);
+    });
 
     r.start();
 
@@ -45,7 +45,7 @@ describe('pushPageAfterPreviews', () => {
       '/info': new Page('info', 'main'),
       '/create': new Page('create', 'main'),
       '/done': new Page('done', 'main'),
-    }, null);
+    });
 
     r.start();
 
@@ -88,7 +88,7 @@ describe('pushPageAfterPreviews', () => {
       '/info': new Page('info', 'main'), // 2
       '/create': new Page('create', 'create'),
       '/done': new Page('done', 'create'), // 1
-    }, null);
+    });
 
     r.start();
 
