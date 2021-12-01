@@ -18,3 +18,4 @@ export * from './lib/hooks/useRoute';
 export * from './lib/hooks/useRouter';
 export * from './lib/hooks/useParams';
 export * from './lib/hooks/useLocation';
+export * from './lib/entities/RouterConfig';
