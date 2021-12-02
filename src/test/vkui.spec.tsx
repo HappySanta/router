@@ -2,21 +2,17 @@ import React from 'react';
 import { Page, RouteList, Router, RouterContext, Location, useLocation, ROOT_MAIN } from '..';
 import { act, render, cleanup } from '@testing-library/react';
 import { noop, delay } from './tools';
-import ConfigProvider from '@vkontakte/vkui/dist/components/ConfigProvider/ConfigProvider';
-import Root from '@vkontakte/vkui/dist/components/Root/Root';
-import View from '@vkontakte/vkui/dist/components/View/View';
-import Panel from '@vkontakte/vkui/dist/components/Panel/Panel';
-import { Epic, Tabbar } from '@vkontakte/vkui';
+import { ConfigProvider, Root, View, Panel, Epic, Tabbar } from '@vkontakte/vkui';
 
 describe('VKUI', () => {
   beforeEach(() => {
     window.history.replaceState({}, '', '/#');
   });
 
-  const getViewProps = (viewId: string, location: Location) => {
+  const getViewProps = (viewId: string, location: Location, defPanel: string) => {
     return {
       id: viewId,
-      activePanel: location.getViewActivePanel(viewId),
+      activePanel: location.getViewActivePanel(viewId) || defPanel,
       history: location.getViewHistory(viewId),
     };
   };
@@ -51,14 +47,14 @@ describe('VKUI', () => {
 
       return (
         <Root activeView={location.getViewId()}>
-          <View {...getViewProps(VIEW_MAIN, location)}>
+          <View {...getViewProps(VIEW_MAIN, location, PANEL_MAIN)}>
             <Panel id={PANEL_MAIN} data-testid={PANEL_MAIN}>{PANEL_MAIN}</Panel>
           </View>
-          <View {...getViewProps(VIEW_ABOUT, location)}>
+          <View {...getViewProps(VIEW_ABOUT, location, PANEL_ABOUT)}>
             <Panel id={PANEL_ABOUT} data-testid={PANEL_ABOUT}>{PANEL_ABOUT}</Panel>
             <Panel id={PANEL_ABOUT_NEXT} data-testid={PANEL_ABOUT_NEXT}>{PANEL_ABOUT_NEXT}</Panel>
           </View>
-          <View {...getViewProps(VIEW_INFO, location)}>
+          <View {...getViewProps(VIEW_INFO, location, PANEL_INFO)}>
             <Panel id={PANEL_INFO} data-testid={PANEL_INFO}>{PANEL_INFO}</Panel>
           </View>
         </Root>
@@ -232,12 +228,12 @@ describe('VKUI', () => {
       return (
         <Epic tabbar={<Tabbar />} activeStory={location.getRootId()}>
           <Root id={ROOT_MAIN} activeView={location.getViewId()}>
-            <View {...getViewProps(VIEW_MAIN, location)}>
+            <View {...getViewProps(VIEW_MAIN, location, PANEL_MAIN)}>
               <Panel id={PANEL_MAIN} data-testid={PANEL_MAIN}>{PANEL_MAIN}</Panel>
             </View>
           </Root>
           <Root id={ROOT_ABOUT} activeView={location.getViewId()}>
-            <View {...getViewProps(VIEW_ABOUT, location)}>
+            <View {...getViewProps(VIEW_ABOUT, location, PANEL_ABOUT)}>
               <Panel id={PANEL_ABOUT} data-testid={PANEL_ABOUT}>{PANEL_ABOUT}</Panel>
               <Panel id={PANEL_ABOUT_NEXT} data-testid={PANEL_ABOUT_NEXT}>{PANEL_ABOUT_NEXT}</Panel>
             </View>
