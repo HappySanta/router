@@ -38,19 +38,19 @@ describe('matchPath', () => {
   });
 
   test('generatePath params', () => {
-    expect(generatePath('user/:id', { id: 5 })).toEqual('user/5');
+    expect(generatePath('user/:id', { id: '5' })).toEqual('user/5');
   });
 
   test('generatePath params and slash', () => {
-    expect(generatePath('/user/:id', { id: 5 })).toEqual('/user/5');
+    expect(generatePath('/user/:id', { id: '5' })).toEqual('/user/5');
   });
 
   test('generatePath inline and additional params', () => {
-    expect(generatePath('user/:id', { id: 19, name: 'Ivan' })).toEqual('user/19?name=Ivan');
+    expect(generatePath('user/:id', { id: '19', name: 'Ivan' })).toEqual('user/19?name=Ivan');
   });
 
   test('generatePath only additional params', () => {
-    expect(generatePath('user', { id: 19, name: 'Ivan' })).toEqual('user?id=19&name=Ivan');
+    expect(generatePath('user', { id: '19', name: 'Ivan' })).toEqual('user?id=19&name=Ivan');
   });
 
   test('generatePath edge case 1', () => {
