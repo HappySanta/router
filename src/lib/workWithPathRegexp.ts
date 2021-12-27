@@ -58,7 +58,7 @@ function convertPath(path: string, options?: ptr.TokensToRegexpOptions & ptr.Par
  * @return {string} /user/5?name=Ivan
  * @ignore
  */
-export function generatePath(pageId: string, params?: {}): string {
+export function generatePath(pageId: string, params?: Record<string, string>): string {
   if (!params) {
     params = {};
   }

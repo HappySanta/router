@@ -24,6 +24,7 @@ let randomIdForCheckState = `${Math.random() * 2000000 }.${Date.now()}`;
  * Используется для тестов где не сбрасывается состояние jsdom
  * @ignore
  */
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export function __testResetHistoryUniqueId() {
   randomIdForCheckState = `${Math.random() * 2000000 }.${Date.now()}`;
 }
