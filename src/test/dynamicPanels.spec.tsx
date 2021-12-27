@@ -58,7 +58,7 @@ describe('dynamic panels', () => {
       return (
         <Root onTransition={() => onTransition()} activeView={location.getViewId()}>
           <View onTransition={() => onTransition()}
-            activePanel={location.getViewActivePanel(VIEW_MAIN) || ''}
+            activePanel={location.getViewActivePanel(VIEW_MAIN) || PANEL_MAIN}
             history={location.getViewHistory(VIEW_MAIN)}
             id={VIEW_MAIN}>
             {panelList}

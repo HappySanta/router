@@ -9,10 +9,10 @@ describe('VKUI', () => {
     window.history.replaceState({}, '', '/#');
   });
 
-  const getViewProps = (viewId: string, location: Location, def: string) => {
+  const getViewProps = (viewId: string, location: Location, defPanel: string) => {
     return {
       id: viewId,
-      activePanel: location.getViewActivePanel(viewId) || def,
+      activePanel: location.getViewActivePanel(viewId) || defPanel,
       history: location.getViewHistory(viewId),
     };
   };
@@ -104,15 +104,12 @@ describe('VKUI', () => {
 
     await expectPanel(PANEL_MAIN);
 
-    await updateAct(1, () => {
+    await updateAct(2, () => {
       router.pushPage(PAGE_INFO);
       router.pushPageAfterPreviews(PAGE_MAIN, PAGE_ABOUT);
     });
 
     await expectPanel(PANEL_ABOUT);
-    // await expectPanel(PANEL_INFO);
-    done();
-    return;
 
     await updateAct(1, () => {
       router.popPage();

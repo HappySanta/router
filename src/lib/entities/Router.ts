@@ -1,7 +1,7 @@
 import { Page } from './Page';
 import { History, UpdateEventType } from './History';
 import { MODAL_KEY, POPUP_KEY, Route as MyRoute } from './Route';
-import { isDesktopSafari, preventBlinkingBySettingScrollRestoration } from '../tools';
+import { isDesktopSafari, isError, preventBlinkingBySettingScrollRestoration } from '../tools';
 import { State, stateFromLocation } from './State';
 import { EventEmitter } from 'tsee';
 
@@ -476,7 +476,7 @@ export class Router extends EventEmitter<{
     try {
       return MyRoute.fromLocation(this.routes, '/', this.config.alwaysStartWithSlash);
     } catch (e) {
-      if (e && e.message === 'ROUTE_NOT_FOUND') {
+      if (isError(e) && e.message === 'ROUTE_NOT_FOUND') {
         return new MyRoute(
           new Page(this.config.defaultPanel, this.config.defaultView, this.config.defaultRoot),
           this.config.defaultPage,
@@ -574,7 +574,7 @@ export class Router extends EventEmitter<{
     try {
       return MyRoute.fromLocation(this.routes, location, this.config.alwaysStartWithSlash);
     } catch (e) {
-      if (e && e.message === 'ROUTE_NOT_FOUND') {
+      if (isError(e) && e.message === 'ROUTE_NOT_FOUND') {
         const def = this.getDefaultRoute(location, MyRoute.getParamsFromPath(location));
         return this.config.replacerUnknownRoute(def, this.history.getCurrentRoute());
       }
@@ -586,7 +586,7 @@ export class Router extends EventEmitter<{
     try {
       return MyRoute.fromLocation(this.routes, location, this.config.alwaysStartWithSlash);
     } catch (e) {
-      if (e && e.message === 'ROUTE_NOT_FOUND') {
+      if (isError(e) && e.message === 'ROUTE_NOT_FOUND') {
         return this.getDefaultRoute(location, MyRoute.getParamsFromPath(location));
       }
       throw e;

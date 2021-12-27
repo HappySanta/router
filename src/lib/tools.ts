@@ -36,3 +36,7 @@ export function isDesktopSafari(): boolean {
     && !ua.includes('Android')
     && !ua.includes('iPhone');
 }
+
+export function isError(e: any): e is Error {
+  return e instanceof Error;
+}

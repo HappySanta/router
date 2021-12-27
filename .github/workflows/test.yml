@@ -16,14 +16,18 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: borales/actions-yarn@v2.0.0
+        name: install
         with:
           cmd: install # will run `yarn install` command
       - uses: borales/actions-yarn@v2.0.0
+        name: build
         with:
           cmd: build # will run `yarn build` command
       - uses: borales/actions-yarn@v2.0.0
+        name: test
         with:
           cmd: test # will run `yarn test` command
       - uses: borales/actions-yarn@v2.0.0
+        name: lint-check
         with:
           cmd: lint-check # will run `yarn lint-check` command
