@@ -22,10 +22,10 @@ yarn add @happysanta/router
 
 # Локальная разработка
 
-удаляет react react-dom который конфилкнуют если вы линкуете через `npm link` `yarn link` либу в другой проект
-```
+```bash
 yarn run fix-for-link
 ```
+Команда удаляет react и react-dom которые конфликтуют с локальными зависимостями, если вы линкуете через `npm link` / `yarn link` либу в другой проект.
 
 
 Публикация
