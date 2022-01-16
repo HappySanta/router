@@ -1,4 +1,6 @@
 import 'core-js/actual/url-search-params';
+import 'core-js/actual/string/includes';
+import 'core-js/actual/string/starts-with';
 export * from './lib/entities/Page';
 export * from './lib/entities/Route';
 export * from './lib/entities/Router';
