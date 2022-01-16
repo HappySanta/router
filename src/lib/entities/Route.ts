@@ -43,9 +43,12 @@ export class Route {
   }
 
   static getParamsFromPath(location: string) {
-    return location.includes('?')
-      ? searchParamsToObject(new URL(location).searchParams) // TODO: update typescript and replace to Object.fromEntries
-      : {};
+    if (location.includes('?')) {
+      const [, qs] = location.split('?', 2);
+      return searchParamsToObject(new URLSearchParams(qs));
+    } else {
+      return {};
+    }
   }
 
   /**

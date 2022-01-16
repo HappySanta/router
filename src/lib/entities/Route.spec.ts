@@ -6,9 +6,21 @@ test('from location', () => {
   const list: RouteList = {
     '/': new Page(),
   };
-  const location = '';
-  expect(!!Route.fromLocation(list, location)).toBe(true);
-  expect(!!Route.fromLocation(list, location, true)).toBe(true);
+  {
+    const location = '';
+    expect(!!Route.fromLocation(list, location)).toBe(true);
+    expect(!!Route.fromLocation(list, location, true)).toBe(true);
+  }
+  {
+    const location = '/';
+    expect(!!Route.fromLocation(list, location)).toBe(true);
+    expect(!!Route.fromLocation(list, location, true)).toBe(true);
+  }
+  {
+    const location = '/?utm_source=ad';
+    expect(!!Route.fromLocation(list, location)).toBe(true);
+    expect(!!Route.fromLocation(list, location, true)).toBe(true);
+  }
 });
 
 test('route clone', () => {
