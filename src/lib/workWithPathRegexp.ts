@@ -4,7 +4,6 @@
  */
 
 import * as ptr from 'path-to-regexp';
-import * as qs from 'querystring';
 
 const cache: Map<string, [ptr.PathFunction, ptr.Token[]]> = new Map<string, [ptr.PathFunction, ptr.Token[]]>();
 const cacheLimit = 10000;
@@ -72,7 +71,7 @@ export function generatePath(pageId: string, params?: {}): string {
       delete restParams[t.name.toString()];
     }
   });
-  const result = `${path}?${qs.stringify(restParams as qs.ParsedUrlQueryInput)}`;
+  const result = `${path}?${new URLSearchParams(restParams).toString()}`;
   return result.replace(/\?$/gmu, '');
 }
 

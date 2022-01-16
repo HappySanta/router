@@ -1,5 +1,4 @@
 import { generatePath, MatchInterface, matchPath } from '../workWithPathRegexp';
-import * as qs from 'querystring';
 import { Page } from './Page';
 import { RouteList } from './Router';
 import { PageParams } from './Types';
@@ -17,6 +16,14 @@ let routeUniqueId = 1;
 
 function getNextUniqId() {
   return routeUniqueId++;
+}
+
+function searchParamsToObject(searchParams: URLSearchParams): {} {
+  const obj: { [key: string]: string } = {};
+  for (const [key, value] of searchParams) {
+    obj[key] = value;
+  }
+  return obj;
 }
 
 export class Route {
@@ -37,7 +44,7 @@ export class Route {
 
   static getParamsFromPath(location: string) {
     return location.includes('?')
-      ? (qs.parse(location.split('?', 2)[1]) as { [key: string]: string })
+      ? searchParamsToObject(new URL(location).searchParams) // TODO: update typescript and replace to Object.fromEntries
       : {};
   }
 

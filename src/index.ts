@@ -1,3 +1,4 @@
+import 'core-js/actual/url-search-params';
 export * from './lib/entities/Page';
 export * from './lib/entities/Route';
 export * from './lib/entities/Router';
